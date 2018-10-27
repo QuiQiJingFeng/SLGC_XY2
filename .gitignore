@@ -1,0 +1,9 @@
+*.dll
+*.ilk
+*.pdb
+*.exe
+*.md
+*.h
+*.c
+*.mk
+*.lib
