@@ -2602,7 +2602,8 @@ MessageBox s
 //注: 在color_fomat最前面加上"b@"表示后面的颜色描述是针对背景色,而非字的颜色.
 ]]
 function DMCenter:Ocr( x1,y1,x2,y2,color_format,sim)
-    return CPLUS.DmCenter.Ocr(self.__dm,x1,y1,x2,y2,color_format,sim)
+    local text = CPLUS.DmCenter.Ocr(self.__dm,x1,y1,x2,y2,color_format,sim)
+    return game.dmcenter:GBKToUTF8(text)
 end
 
 

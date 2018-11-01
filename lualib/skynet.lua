@@ -312,7 +312,7 @@ function skynet.time()
 end
 
 function skynet.exit()
-	fork_queue = {}	-- no fork coroutine can be execute after skynet.exit
+	fork_queue = {}	-- no fork coroutine can be Execute after skynet.exit
 	skynet.send(".launcher","lua","REMOVE",skynet.self(), false)
 	-- report the sources that call me
 	for co, session in pairs(session_coroutine_id) do
@@ -671,5 +671,181 @@ debug(skynet, {
 	clear = clear_pool,
 	suspend = suspend,
 })
+
+
+--[[
+	CUSTOM
+]]
+
+local setmetatableindex_
+setmetatableindex_ = function(t, index)
+    if type(t) == "userdata" then
+		error("unsupport")
+    else
+        local mt = getmetatable(t)
+        if not mt then
+            mt = {}
+        end
+        if not mt.__index then
+            mt.__index = index
+            setmetatable(t, mt)
+        elseif mt.__index ~= index then
+            setmetatableindex_(mt, index)
+        end
+    end
+end
+local setmetatableindex = setmetatableindex_
+
+function class(classname, ...)
+    local cls = {__cname = classname}
+
+    local supers = {...}
+    for _, super in ipairs(supers) do
+        local superType = type(super)
+        assert(
+            superType == "nil" or superType == "table" or superType == "function",
+            string.format('class() - create class "%s" with invalid super class type "%s"', classname, superType)
+        )
+
+        if superType == "function" then
+            assert(
+                cls.__create == nil,
+                string.format('class() - create class "%s" with more than one creating function', classname)
+            )
+            -- if super is function, set it to __create
+            cls.__create = super
+        elseif superType == "table" then
+            if super[".isclass"] then
+                -- super is native class
+                assert(
+                    cls.__create == nil,
+                    string.format(
+                        'class() - create class "%s" with more than one creating function or native class',
+                        classname
+                    )
+                )
+                cls.__create = function()
+                    return super:create()
+                end
+            else
+                -- super is pure lua class
+                cls.__supers = cls.__supers or {}
+                cls.__supers[#cls.__supers + 1] = super
+                if not cls.super then
+                    -- set first super pure lua class as class.super
+                    cls.super = super
+                end
+            end
+        else
+            error(string.format('class() - create class "%s" with invalid super type', classname), 0)
+        end
+    end
+
+    cls.__index = cls
+    if not cls.__supers or #cls.__supers == 1 then
+        setmetatable(cls, {__index = cls.super})
+    else
+        setmetatable(
+            cls,
+            {
+                __index = function(_, key)
+                    local supers = cls.__supers
+                    for i = 1, #supers do
+                        local super = supers[i]
+                        if super[key] then
+                            return super[key]
+                        end
+                    end
+                end
+            }
+        )
+    end
+
+    if not cls.ctor then
+        -- add default constructor
+        cls.ctor = function()
+        end
+    end
+    cls.new = function(...)
+        local instance
+        if cls.__create then
+            instance = cls.__create(...)
+        else
+            instance = {}
+        end
+        setmetatableindex(instance, cls)
+        instance.class = cls
+        instance:ctor(...)
+        return instance
+    end
+    cls.create = function(_, ...)
+        return cls.new(...)
+    end
+
+    return cls
+end
+
+
+function string.split(input, delimiter)
+    input = tostring(input)
+    delimiter = tostring(delimiter)
+    if (delimiter == "") then
+        return false
+    end
+    local pos, arr = 0, {}
+    -- for each divider found
+    for st, sp in function()
+        return string.find(input, delimiter, pos, true)
+    end do
+        table.insert(arr, string.sub(input, pos, st - 1))
+        pos = sp + 1
+    end
+    table.insert(arr, string.sub(input, pos))
+    return arr
+end
+
+function handler(obj, method)
+    return function(...)
+        return method(obj, ...)
+    end
+end
+
+function _p(x, y)
+    return {x = x, y = y}
+end
+
+function _rect(x, y, width, height)
+    return {x = x, y = y, width = width, height = height}
+end
+
+
+function _clone(object)
+    local lookup_table = {}
+    local function _copy(object)
+        if type(object) ~= "table" then
+            return object
+        elseif lookup_table[object] then
+            return lookup_table[object]
+        end
+        local newObject = {}
+        lookup_table[object] = newObject
+        for key, value in pairs(object) do
+            newObject[_copy(key)] = _copy(value)
+        end
+        return setmetatable(newObject, getmetatable(object))
+    end
+    return _copy(object)
+end
+
+function _distance(pos1, pos2)
+    local dx = pos1.x - pos2.x
+    local dy = pos1.y - pos2.y
+    return (dx ^ 2 + dy ^ 2) ^ 0.5
+end
+
+function _size(width, height)
+    return {width = width, height = height}
+end
+
 
 return skynet

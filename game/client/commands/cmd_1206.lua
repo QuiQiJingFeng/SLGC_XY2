@@ -4,7 +4,7 @@ local super = require("commands.cmd_base")
 local cmd = class("cmd_1206",super)
 
 --袁天罡任务
-function cmd:execute()
+function cmd:Execute()
 	return true
 end
 

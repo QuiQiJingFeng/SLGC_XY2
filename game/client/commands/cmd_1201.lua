@@ -12,13 +12,13 @@ local Constants = require("common/Constants")
 
 function cmd:goTingYuan()
 	--寻路到长安 161,128 
-	if not CommandCenter:execute("1105","长安",cc.pos(161,128)) then
+	if not CommandCenter:Execute("1105","长安",_p(161,128)) then
 		skynet.error("寻路到长安失败")
 		return
 	end
 	local result = false
 	--1、通过对话图标的方式找超级管家
-	if CommandCenter:execute("1106",cc.pos(161,128)) then
+	if CommandCenter:Execute("1106",_p(161,128)) then
 		result = true
 	else
 		skynet.error("对话图标的方式查找超级管家失败")
@@ -26,7 +26,7 @@ function cmd:goTingYuan()
 	--2、通过找图的方式 对话超级管家
 	if not result then
 	 	local path = "resource/15.bmp|resource/16.bmp|resource/17.bmp|resource/18.bmp"
-	    local array = self:repeatFindEx(1,0,0,800,600, path, "020202", 1, 0)
+	    local array = self:RepeatFindEx(1,0,0,800,600, path, "020202", 1, 0)
 	    if #array > 0 then
 	    	HardWareUtil:MoveAndClick(array[1])
 	    	result = true
@@ -37,7 +37,7 @@ function cmd:goTingYuan()
 
  	-- 3、通过小红点的方式 对话超级管家
 	if not result then
-	 	if CommandCenter:execute("1101","超级管家") then
+	 	if CommandCenter:Execute("1101","超级管家") then
 			result = true
 		else
 			skynet.error("小红点的方式查找超级管家失败")
@@ -65,8 +65,8 @@ function cmd:goTingYuan()
 	return true
 end
 
-function cmd:execute()
-	local config = self:getBigMapAreaAndPos()
+function cmd:Execute()
+	local config = self:GetCurAreaAndPos()
 	skynet.error("name = ",config.name)
 	if config.name ~= "庭院" then
 		if not self:goTingYuan() then
@@ -75,13 +75,13 @@ function cmd:execute()
 	end
 	skynet.sleep(100)
    	--移动到庭院30,30
-   	if not CommandCenter:execute("1105","庭院",cc.pos(33,31)) then
+   	if not CommandCenter:Execute("1105","庭院",_p(33,31)) then
 		skynet.error("移动到庭院 任务台 失败")
 		return
 	end
 
 	--弹出任务面板
-	if not CommandCenter:execute("1106",cc.pos(28,32),"finger") then
+	if not CommandCenter:Execute("1106",_p(28,32),"finger") then
 		skynet.error("弹出任务面板失败1")
 		return
 	end
@@ -110,7 +110,7 @@ function cmd:execute()
 	skynet.sleep(100)
 	
 	--弹出任务面板
-	if not CommandCenter:execute("1106",cc.pos(28,32),"finger") then
+	if not CommandCenter:Execute("1106",_p(28,32),"finger") then
 		skynet.error("弹出任务面板失败2")
 		return
 	end
@@ -133,7 +133,6 @@ function cmd:checkIsCanGetTask()
 	skynet.sleep(10)
 	--解析职业状态
 	local str = DMCenter:Ocr(96, 127, 587+96, 362+127,"ffffff-101010|00ff00-303030|ffff00-000000",1)
- 	str = DMCenter:GBKToUTF8(str)
  	if not string.find(str,"制符") then
 		skynet.error("查找字符失败")
 		return
@@ -162,7 +161,7 @@ function cmd:checkIsCanGetTask()
 		return "FINISH"
 	end
 
-	HardWareUtil:MoveAndClick(cc.pos(382,259))
+	HardWareUtil:MoveAndClick(_p(382,259))
 	return "SUCCESS"
 end
 

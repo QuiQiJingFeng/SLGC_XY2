@@ -1,0 +1,20 @@
+[:01000001] LAUNCH logger ./log/print.log
+[:01000002] LAUNCH snlua bootstrap
+[:01000003] LAUNCH snlua launcher
+[:01000004] LAUNCH snlua cmaster
+[:01000004] master listen socket 0.0.0.0:2013
+[:01000005] LAUNCH snlua cslave
+[:01000005] slave connect to master 127.0.0.1:2013
+[:01000006] LAUNCH harbor 1 16777221
+[:01000004] connect from 127.0.0.1:11781 4
+[:01000004] Harbor 1 (fd=4) report 127.0.0.1:2526
+[:01000005] Waiting for 0 harbors
+[:01000005] Shakehand ready
+[:01000007] LAUNCH snlua datacenterd
+[:01000008] LAUNCH snlua service_mgr
+[:01000009] LAUNCH snlua main
+[:0100000a] LAUNCH snlua hardware
+[:0100000b] LAUNCH snlua client
+[:01000009] KILL self
+[:01000002] KILL self
+[:0100000b] [INFO][client][16777227]GAME START---.>>.

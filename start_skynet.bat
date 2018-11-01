@@ -1,0 +1,1 @@
+skynet.exe conf/config.lua
