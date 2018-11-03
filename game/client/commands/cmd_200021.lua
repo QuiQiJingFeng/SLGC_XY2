@@ -30,7 +30,7 @@ function cmd:update()
 			return "ERROR"
 		end
 		skynet.sleep(40)
-		HardWareUtil:MoveTo(600,300)
+		HardWareUtil:MoveTo(_p(600,300))
 		skynet.sleep(10)
 		str = self:parseTask("职业任务")
 	end

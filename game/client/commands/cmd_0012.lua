@@ -6,7 +6,20 @@ local cmd = class("cmd", super)
 
 --自动寻路=>移动到指定场景的指定坐标
 function cmd:Start(sceneName, coordPos, stopArea)
-    local times = 5
+    local data = self:GetCurAreaAndPosWithCapther()
+    if not data then
+        return
+    end
+    --如果相同那么执行小地图移动
+    if string.find(data.name,sceneName)  then
+        if stopArea then
+            return true
+        end
+        local distance = _distance(coordPos,data)
+        if distance <= 10 then
+            return true
+        end
+    end
     self:FlyUp()
     while true do
         for i=1,1 do
@@ -50,6 +63,7 @@ function cmd:Start(sceneName, coordPos, stopArea)
                     return true
                 end
             end
+            HardWareUtil:MoveTo(_p(750,math.random(10,60)))
             --检测黄色提示标志
             if game.cmdcenter:TestExecute("0003") then
                 --点击了黄色标志之后

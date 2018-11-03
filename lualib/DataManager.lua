@@ -36,6 +36,11 @@ function DataManager:ConvertData(data,name)
         return data[name]
     end
     name = string.gsub(name,"%.","")
+    for key,v in pairs(data) do
+        if string.find(name,key) then
+            return v
+        end
+    end
     --当name比地图的key小的时候,无法确定name传递过来的是否合法
     --比如说你传过来个城字,鬼知道是哪里啊
     --所以说大地图当中的名字尽量精简

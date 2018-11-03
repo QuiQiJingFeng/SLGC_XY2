@@ -4,15 +4,14 @@ local super = require "commands.base"
 local cmd = class("cmd", super)
 
 
---目標點附近才能使用這個方法,用來查找對話標誌
-function cmd:Execute(targetPos,type)
-	local data = self:GetCurAreaAndPos()
+--查找对话标志,旁边才能使用
+function cmd:Execute(coordPos,type)
+	local data = self:GetCurAreaAndPosWithCapther()
 	if not data then
-		game.log.warning("获取地图名称和坐标失败")
 		return
 	end
-	local dx = (targetPos.x - data.x) * 20
-	local dy = (data.y - targetPos.y) * 20
+	local dx = (coordPos.x - data.x) * 20
+	local dy = (data.y - coordPos.y) * 20
 	local playerPixelPos = self:getPlayerPixelPos()
 	if not playerPixelPos then
 		return game.log.warning("获取玩家像素位置失败")
@@ -24,8 +23,10 @@ function cmd:Execute(targetPos,type)
 
 	local findChat = false
 	local unit = 10
-	for i=1,10 do
-		HardWareUtil:MoveTo(targetCPos.x,targetCPos.y)
+    for i=1,10 do
+        local px = math.random(0,1) > 0.5 and 1 or -1
+        local dx = math.random(5,10) * px
+		HardWareUtil:MoveTo(_p(targetCPos.x+dx,targetCPos.y))
 		skynet.sleep(20)
 		if type == "finger" then
 	    	local path = "finger_1.bmp"
@@ -38,7 +39,8 @@ function cmd:Execute(targetPos,type)
 	    	local path = "chat_1.bmp|chat_2.bmp|chat_3.bmp|chat_4.bmp"
 		    local ret = game.dmcenter:FindPicExS(0,0,800,600, path, "020202", 1, 0)
 		    if not (ret == "") then
-		    	findChat = true
+                findChat = true
+                targetCPos.x = targetCPos.x + dx
 		    	break
 		    end
 	    end

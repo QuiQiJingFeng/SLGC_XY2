@@ -38,7 +38,7 @@ function CommandCenter:TestExecute(cmd,...)
 end
 
 function CommandCenter:Start()
-    game.cmdcenter:Execute("0012","斧头帮",_p(90,30))
+    game.cmdcenter:Execute("1205")
 end
 
 

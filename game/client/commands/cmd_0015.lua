@@ -5,16 +5,9 @@ local cmd = class("cmd", super)
 
 --洛阳购买指定的药品
 function cmd:Execute(name,num)
-    game.cmdcenter:Execute("1102", "洛阳城", _p(156, 147), true, true)
-    if self:CheckFlyFlag("洛阳城", _p(140, 60), false, true,{x1=250,y1=195,x2=323,y2=279}) then
-        skynet.sleep(30)
-        game.cmdcenter:Execute("1106", _p(14, 12))
-    else
-        game.cmdcenter:Execute("1105", "洛阳城", _p(156, 147), true)
-        game.cmdcenter:Execute("1101", "药店老板")
-    end
-
-    local success = false
+    local rect = {x1=250,y1=195,x2=323,y2=279}
+    self:GoToWithYellow("洛阳城",_p(156, 147),rect,"药店老板",_p(14,12))
+    local success
     for i=1,30 do
         success = self:searchAndClickText("00d011-000000", "买点东西")
         if success then

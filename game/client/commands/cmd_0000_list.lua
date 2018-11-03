@@ -80,13 +80,15 @@ game.cmdcenter:Execute("0008")
 cmd_0009    通过大地图打开小地图并 点击指定坐标
 name 场景名称
 coordPos 坐标点
+click  是否点击(默认是点击)
 game.cmdcenter:Execute("0009","长安",_p(50,50))
 
 
 cmd_0010    
 与指定NPC对话 小红点查找的方式
 不负责移动过程的检测,留给调用者负责检测
-game.cmdcenter:TestExecute("0010")
+npcName NPC的名称
+game.cmdcenter:TestExecute("0010","超级管家")
 
 
 
@@ -103,3 +105,21 @@ sceneName 寻路的场景名称
 coordPos 寻路的场景坐标点
 stopArea 是否到达场景之后就退出
 game.cmdcenter:Execute("0012","长安",_p(50,50),true)
+
+
+cmd_0013
+查找对话标志,旁边才能使用
+coordPos 目标点的坐标
+type  对话的类型
+game.cmdcenter:Execute("0013",_p(50,50),"finger")
+
+
+cmd_0014
+获取指定题目的答案
+game.cmdcenter:Execute("0014","但愿人长久")
+
+cmd_0015
+去洛阳购买指定的药品
+name  药品名称
+num    数量
+game.cmdcenter:Execute("0015","风水混元丹",1)

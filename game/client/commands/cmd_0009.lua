@@ -4,7 +4,10 @@ local super = require "commands.base"
 local cmd = class("cmd", super)
 
 --通过大地图打开小地图并 点击指定坐标
-function cmd:Execute(name,coordPos)
+function cmd:Execute(name,coordPos,click)
+    if click == nil then
+        click = true
+    end
     --打开大地图 并确认大地图打开之后返回
     game.cmdcenter:Execute("0004")
     local data = game.data:GetBigMapByName(name)
@@ -15,7 +18,10 @@ function cmd:Execute(name,coordPos)
 	if not self:IsSmallMapOpen(10) then
 		game.log.warning("没有检测到小地图打开")
 		return
-	end
+    end
+    if not click then
+        return true
+    end
 	local pixelPos = self:ConvertToWordSpace(name, coordPos, "big")
 	if not pixelPos then
 		game.log.warningf("转换坐标到屏幕坐标失败 地区[%s]", name)

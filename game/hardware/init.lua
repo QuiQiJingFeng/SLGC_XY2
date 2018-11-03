@@ -8,7 +8,7 @@ local command = {}
 function command:MoveToBezier(target)
     local pos = game.dmcenter:GetCursorPos()
     local distance = _distance(pos,target)
-    local num = distance/10 * 0.8
+    local num = distance/10 * 0.5
     local list = Bezier:BezierTo(pos,target,num)
     table.insert(list,target)
     for i,v in ipairs(list) do

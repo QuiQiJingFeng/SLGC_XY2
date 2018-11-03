@@ -7,9 +7,9 @@ function cmd:Execute(errorType)
     self.__errorType = errorType or "ESCAPE"
     --等待移动停止
     game.log.info("移动中")
-    self:WaitMoveEnd()
+    local ret = self:WaitMoveEnd()
     game.log.info("移动停止")
-    return true
+    return ret
 end
 
 function cmd:ErrorProcess()

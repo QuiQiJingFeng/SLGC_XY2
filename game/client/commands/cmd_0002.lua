@@ -52,18 +52,11 @@ function cmd:GetFashuPath()
     return table.concat(paths, "|")
 end
 
-cmd["FIGHT"] = function(self)
-    HardWareUtil:KeyPad("f1")
-    local pos = game.dmcenter:FindColorBlock(0, 75, 339, 460, "004b00-101010|007b00-101010", 1, 50, 30, 20)
-    if pos.x == 0 and pos.y == 0 then
-        game.log.error("没有找到怪物")
-        return
-    end
-    pos.x  = pos.x + 10
+function cmd:SearchMaster(pos)
+    pos.y = pos.y - 10
     local find = false
-    for i=1,10 do
+    for i=1,8 do
         HardWareUtil:MoveTo(pos)
-        skynet.sleep(10)
         local path = self:GetFashuPath()
         local unit = 50
         local x1 = pos.x - 50
@@ -88,10 +81,32 @@ cmd["FIGHT"] = function(self)
         pos.y = pos.y - 10
     end
     if not find then
-        game.log.error("没有找到法术释放点")
         return
     end
-    HardWareUtil:LeftClick()
+    return pos
+end
+
+cmd["FIGHT"] = function(self)
+    HardWareUtil:KeyPad("f1")
+    skynet.sleep(50)
+    local pos = game.dmcenter:FindColorBlock(0, 75, 339, 460, "004b00-101010|007b00-101010", 1, 50, 30, 20)
+    if pos.x == 0 and pos.y == 0 then
+        game.log.error("没有找到怪物")
+        return
+    end
+    local tpos
+    for i=1,5 do
+        local newpos = _clone(pos)
+        newpos.x = newpos.x + (i-1) * 10
+        tpos = self:SearchMaster(newpos)
+        if tpos then
+            break
+        end
+    end
+    if not tpos then
+        game.log.error("没有找到法术释放点")
+    end
+    HardWareUtil:MoveAndClick(tpos)
     skynet.sleep(10)
     HardWareUtil:KeyPad("alt+a")
     HardWareUtil:MoveTo(_p(400,300))

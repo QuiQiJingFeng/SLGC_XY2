@@ -191,4 +191,230 @@ function cmd_base:ConvertToWordSpace(name, pos, source)
     return _p(x, y)
 end
 
+--获取当前角色的实际屏幕坐标 --1个坐标==20 像素
+function cmd_base:getPlayerPixelPos()
+    local size = game.dmcenter:GetClientSize()
+    local center = _p(math.ceil(size.width / 2), math.ceil(size.height / 2))
+    local data = self:GetCurAreaAndPosWithCapther()
+    if not data then
+        return
+    end
+    local conf = game.data:GetSmallMapByName(data.name)
+    local unit = 20
+    local mapSize = _size(conf.width * unit, conf.height * unit)
+    local x, y
+    local curRealPos = _p(data.x * unit, data.y * unit)
+    if curRealPos.x >= size.width / 2 and curRealPos.x <= mapSize.width - (size.width / 2) then
+        x = center.x
+    end
+    if curRealPos.y >= size.height / 2 and curRealPos.y <= mapSize.height - (size.height / 2) then
+        y = center.y
+    end
+
+    if curRealPos.x < size.width / 2 then
+        x = curRealPos.x
+    end
+    if curRealPos.x > mapSize.width - (size.width / 2) then
+        x = size.width - (mapSize.width - curRealPos.x)
+    end
+
+    if curRealPos.y < size.height / 2 then
+        y = size.height - curRealPos.y
+    end
+
+    if curRealPos.y > mapSize.height - (size.height / 2) then
+        y = size.height - size.height / 2 - (mapSize.height - curRealPos.y) + center.y
+    end
+    return _p(x, y)
+end
+
+--检查是否可以飞行
+--name 目标场景名称
+--coordPos 目标坐标
+function cmd_base:CheckFlyFlag(name, coordPos,source,yellow,conf)
+    local data = self:GetCurAreaAndPosWithCapther()
+    if not data then
+        return
+    end
+
+    local pixelPos = self:ConvertToWordSpace(name, coordPos,source)
+    if not pixelPos then
+        game.log.warningf("转换坐标到屏幕坐标失败 地区[%s]", name)
+        return
+    end
+    HardWareUtil:MoveTo(_p(math.random(750,800),math.random(0,50)))
+
+    local playerPixelPos = self:ConvertToWordSpace(name, _p(data.x, data.y),source)
+    local path = "11.bmp" --去掉黄色的飞行棋 12.bmp
+    --为了直接飞到屋里做的判断
+    if yellow then
+        path = "12.bmp"
+    end
+    local x1 = 0
+    local y1 = 0
+    local x2 = 800
+    local y2 = 600
+    if conf then
+        x1 = conf.x1
+        y1 = conf.y1
+        x2 = conf.x2
+        y2 = conf.y2
+    end
+    local list = self:RepeatFindEx(5, x1, y1, x2, y2, path, "020202", 1.0, 0)
+    if #list <= 0 then
+        game.log.info("没有飞行棋")
+        return
+    end
+    --为了避免两个旗距离相等,加个0-1的随机数
+    for _, pos in ipairs(list) do
+        pos.wight = _distance(pos, pixelPos) + math.random(0,1)
+    end
+    --将飞行棋按照距离目标点的距离远近进行排序
+    table.sort(list,function(a, b)
+            return a.wight < b.wight
+        end)
+    
+    --飞行之前 先要 降落下来
+    self:FlyDown()
+    --取一个距离目标点最近的旗
+    local flag = list[1]
+    local delt = 100
+    --如果人物跟目标点的距离 减去 旗子跟目标点的距离 大于delt个 像素,就不飞行了
+    local playerDistance = _distance(playerPixelPos, pixelPos)
+    local flagDistance = flag.wight
+
+    local canfly = false
+    if name ~= data.name then
+        canfly = true
+    else
+        --如果飞行棋距离目标点过近，会导致点到飞行棋上,而大于50像素的话
+        --是不会将目标点盖住的
+        if playerDistance - flagDistance > delt  or flagDistance <= 50 then
+            canfly = true
+        end
+    end
+    if canfly then
+        HardWareUtil:MoveAndClick(list[1])
+        for i=1,1000 do
+            local success = self:searchAndClickText("00d011-101010", "送我去")
+            if success then
+                return true
+            end
+        end
+        skynet.sleep(100)
+    end
+end
+
+function cmd_base:searchAndClickText(corlor_format, text)
+    game.dict:ChangeDict("ST_11")
+    local list = game.dmcenter:GetWordsNew(100, 125, 650, 500, corlor_format, 1)
+    if not list or #list <= 0 then
+        return
+    end
+    local select = nil
+    for _, obj in pairs(list) do
+        if string.find(obj.word, text) then
+            select = obj
+        end
+    end
+    if not select then
+        return
+    end
+    HardWareUtil:MoveAndClick(select.pos)
+    skynet.sleep(100)
+
+    return true
+end
+
+
+--解析当前任务栏任务，并返回其描述
+function cmd_base:parseTask(taskName, corlor_format)
+    --打开任务面板
+    game.cmdcenter:Execute("0007")
+    game.dict:ChangeDict("ST_11")
+    local list
+    local select = nil
+    for i = 1, 5 do
+        list = game.dmcenter:GetWordsNew(149, 160, 149 + 149, 234 + 160, "ffffff-101010|d2d000-303030|989413-303030", 1)
+        --检查当前是否有职业任务这个选项
+        --如果没有,那么将所有处于打开状态的任务关闭 之后再次检查
+        for i, obj in ipairs(list) do
+            if string.find(obj.word, taskName) then
+                select = obj
+                break
+            end
+        end
+        if select then
+            break
+        end
+        --如果所有的都处于关闭状态了还没有找到职业任务
+        local hasOpen = false
+        for i = #list, 1, -1 do
+            local obj = list[i]
+            if string.find(obj.word, "★") then
+                HardWareUtil:MoveAndClick(obj.pos)
+                hasOpen = true
+            end
+        end
+        --没有职业任务
+        if not hasOpen then
+            --关闭任务面板
+            game.cmdcenter:Execute("0008")
+            return
+        end
+        HardWareUtil:MoveTo(_p(math.random(0,50),math.random(0,50)))
+    end
+    if not select then
+        --关闭任务面板
+        game.cmdcenter:Execute("0008")
+        return
+    end
+
+    --如果处于关闭状态,那么打开它
+    if string.find(select.word, "☆") then
+        HardWareUtil:MoveAndClick(select.pos)
+        skynet.sleep(20)
+    end
+    select.pos.y = select.pos.y + 20
+    HardWareUtil:MoveAndClick(select.pos)
+    skynet.sleep(20)
+    corlor_format = corlor_format or "00ff00-101010"
+    local str = game.dmcenter:Ocr(371, 158, 275 + 371, 293 + 158, corlor_format, 1)
+    --关闭任务面板
+    game.cmdcenter:Execute("0008")
+
+    return str
+end
+
+function cmd_base:GoToWithYellow(name,pos,rect,npcName,npcPos)
+    --打开name的小地图
+    game.cmdcenter:Execute("0009",name,pos,false)
+    --1、飞检测黄色飞行棋
+    if not self:CheckFlyFlag(name, pos,"big",true,rect) then
+        --如果没有黄色的飞行棋,则检测蓝色的飞行棋
+        if not self:CheckFlyFlag(name,pos,"big") then
+            --寻路
+            game.cmdcenter:Execute("0012",name,pos,true)
+        end
+        --小红点查找
+        game.cmdcenter:TestExecute("0010",npcName)
+        --检测是否移动停止,停止则返回
+        game.cmdcenter:Execute("0001","FIGHT")
+    else
+        game.cmdcenter:Execute("0013",npcPos)
+    end
+end
+
+function cmd_base:GoTo(name,pos,stopArea)
+    --打开name的小地图
+    game.cmdcenter:Execute("0009",name,pos,false)
+    --检测蓝色的飞行棋
+    if not self:CheckFlyFlag(name,pos,"big") then
+        --寻路
+        game.cmdcenter:Execute("0012",name,pos,stopArea)
+    else
+        game.cmdcenter:Execute("0012",name,pos,stopArea)
+    end
+end
+
 return cmd_base
