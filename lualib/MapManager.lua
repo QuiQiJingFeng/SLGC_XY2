@@ -40,15 +40,15 @@ function MapManager:CloseAllMap()
 	local bigOpen = self:CheckBigMapOpen()
 	if bigOpen then
 		HardWareUtil:KeyPad("alt+2")
-	end
+    end
+    skynet.sleep(50)
 end
 
 function MapManager:CloseSmallMap()
-    local smallClose = false
 	local smallOpen = self:CheckSmallMapOpen()
 	if smallOpen then
 		HardWareUtil:KeyPad("alt+1")
-		smallClose = true
+        skynet.sleep(50)
 	end
 end
 
@@ -92,9 +92,9 @@ function MapManager:ConvertToWordSpace(name, pos, fromBigMap)
     local width = math.abs(list[2].x - list[1].x)
     local height = math.abs(list[2].y - list[1].y)
     --小地图的实际像素范围
-    local pixelRect = _rect(list[1].x, list[1].y, width, height)
+    local pixelRect = {x = list[1].x,y= list[1].y,width= width,height= height}
     --小地图的坐标范围
-    local coordRect = _rect(data.x, data.y, data.width, data.height)
+    local coordRect = {x=data.x, y=data.y, width = data.width,height = data.height}
     local xradio = pixelRect.width / coordRect.width
     local yradio = pixelRect.height / coordRect.height
 

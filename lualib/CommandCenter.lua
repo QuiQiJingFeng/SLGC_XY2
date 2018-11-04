@@ -38,10 +38,7 @@ function CommandCenter:TestExecute(cmd,...)
 end
 
 function CommandCenter:Start()
-    while true do
-        game.cmdcenter:Execute("battle","ESCAPE")
-        skynet.sleep(100)
-    end
+    game.cmdcenter:Execute("make_flag")
 end
 
 

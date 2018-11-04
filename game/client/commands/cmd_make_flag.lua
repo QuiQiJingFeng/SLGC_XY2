@@ -4,9 +4,9 @@ local super = require "commands.base"
 local cmd = class("cmd", super)
 --TODO
 local CONVERT_NAMES = {
-    ["金銮殿"] = { name = "皇宫",x=1,y=1},
-    ["药店"] = {name = "洛阳城",x=1,y=1},
-    ["杂货店"] = {name = "长安城",x=1,y=1}
+    ["金銮殿"] = { name = "皇宫",x=139,y=59},
+    ["药店"] = {name = "洛阳城",x=163,y=164},
+    ["杂货店"] = {name = "长安城",x=90,y=155}
 }
 
 --1、检查当前位置是否有旗,如果有则跳过并返回true
@@ -18,19 +18,25 @@ function cmd:Execute()
     end
     game.map:CloseAllMap()
     game.map:OpenBigMap()
+    game.map:OpenSmallMapFromBigMap(data.name)
     local pixelPos =  game.map:ConvertToWordSpace(data.name, data, true)
     --将鼠标移动到不覆盖旗帜的位置
     HardWareUtil:MoveTo(_p(pixelPos.x+math.random(30,50),pixelPos.y+math.random(30,50)))
     local path = "11.bmp|12.bmp"
     local rect = _rect(pixelPos,30)
-    local list = self:RepeatFindEx(5,rect.x1,rect.y1,rect.x2,rect.y2, path, "020202", 1.0, 0)
+    local list = self:RepeatFindEx(5,rect[1],rect[2],rect[3],rect[4], path, "020202", 1.0, 0)
     if #list > 0 then
         game.log.info("当前位置已经有飞行旗了")
+        game.map:CloseAllMap()
         return true
     end
     --开始立FLAG
     game.log.info("开始立插旗 ^o_o^")
-    return self:MakeFlag()
+    HardWareUtil:MoveTo(_p(math.random(500,600),math.random(400,600)))
+    local result = self:MakeFlag()
+    game.bag:CloseBag()
+    game.map:CloseAllMap()
+    return result
 end
 
 function cmd:MakeFlag()
@@ -57,9 +63,7 @@ function cmd:MakeFlag()
     if game.tip:Check(10,"做好了") then
         return true
     end
-
     self:searchAndClickText("00d011-101010", "新增路标")
-
     return true
 end
 

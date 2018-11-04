@@ -15,8 +15,7 @@ function ItemManager:Distinguish(key,CONTENT_RECT)
     for _,obj in ipairs(list) do
         HardWareUtil:MoveTo(obj)
         local rect = _rect(obj,300)
-        skynet.sleep(100)
-        
+        skynet.sleep(200)
         local times = game.dmcenter:Ocr(rect[1],rect[2],rect[3],rect[4],"ff0000-101010", 1)
         local iter = string.gmatch(times,"%d+")
         local times = tonumber(iter())

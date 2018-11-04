@@ -69,6 +69,7 @@ function BagManager:CloseBag()
         --如果物品栏处于打开状态
         HardWareUtil:KeyPad("alt+e")
     end
+    skynet.sleep(50)
 end
 
 function BagManager:Sort()
