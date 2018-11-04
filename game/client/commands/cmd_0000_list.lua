@@ -123,3 +123,9 @@ cmd_0015
 name  药品名称
 num    数量
 game.cmdcenter:Execute("0015","风水混元丹",1)
+
+
+
+
+
+game.dmcenter:MatchPicName("fashu/*.bmp")

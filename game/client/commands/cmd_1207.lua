@@ -5,12 +5,12 @@ local cmd = class("cmd", super)
 
 --道士任务
 function cmd:Execute()
-	-- -- --寻路道士
-	-- game.cmdcenter:Execute("1105", "方寸山", _p(30, 10))
-	-- --对话道士
-	-- game.cmdcenter:Execute("1106", _p(35, 13))
-	-- --到地狱迷宫一层
-	-- game.cmdcenter:Execute("1105", "地狱迷宫一层", _p(20, 7))
+	-- --寻路道士
+	game.cmdcenter:Execute("1105", "方寸山", _p(30, 10))
+	--对话道士
+	game.cmdcenter:Execute("1106", _p(35, 13))
+	--到地狱迷宫一层
+	game.cmdcenter:Execute("1105", "地狱迷宫一层", _p(20, 7))
 	if self:process() then
 		game.cmdcenter:Execute("1105", "方寸山", _p(30, 10))
 		game.cmdcenter:Execute("1106", _p(35, 13))

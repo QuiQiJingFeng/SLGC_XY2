@@ -538,7 +538,7 @@ end
 --[[
 enable 整形数: 0 关闭 1 打开
 ]]
-function DMCenter:EnableGetColorByCapture( enable)
+function DMCenter:EnableGetColorByCapture(enable)
     return CPLUS.DmCenter.EnableGetColorByCapture(self.__dm,enable) == 1
 end
 
@@ -1340,7 +1340,13 @@ Trace "宽度:"&w
 Trace "高度:"&h
 ]]
 function DMCenter:GetPicSize( pic_name)
-    return CPLUS.DmCenter.GetPicSize(self.__dm,pic_name)
+    local ret = CPLUS.DmCenter.GetPicSize(self.__dm,pic_name)
+    if ret == "" then
+        game.log.error("没有找到图片=>",pic_name)
+        return
+    end
+    local list = string.split(ret,",")
+    return list[1],list[2]
 end
 
 

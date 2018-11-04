@@ -814,8 +814,15 @@ function _p(x, y)
     return {x = x, y = y}
 end
 
-function _rect(x, y, width, height)
-    return {x = x, y = y, width = width, height = height}
+--获取以pos为中心,unit为半径的矩形
+function _rect(pos,unit)
+    local x1 = pos.x - unit
+    local y1 = pos.y - unit
+    local x2 = pos.x + unit
+    local y2 = pos.y + unit
+    x1 = x1 > 0 and x1 or 0
+    y1 = y1 > 0 and y1 or 0
+    return {x1,y1,x2,y2}
 end
 
 
@@ -847,5 +854,17 @@ function _size(width, height)
     return {width = width, height = height}
 end
 
+function string.ltrim(input)
+    return string.gsub(input, "^[ \t\n\r]+", "")
+end
+
+function string.rtrim(input)
+    return string.gsub(input, "[ \t\n\r]+$", "")
+end
+
+function string.trim(input)
+    input = string.gsub(input, "^[ \t\n\r]+", "")
+    return string.gsub(input, "[ \t\n\r]+$", "")
+end
 
 return skynet

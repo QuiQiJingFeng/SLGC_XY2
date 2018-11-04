@@ -29,3 +29,4 @@ test/
 lualib/READEME
 LICENSE
 Makefile
+dm/res/error/

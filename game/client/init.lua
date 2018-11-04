@@ -27,7 +27,8 @@ function command:Start(hwnd)
 	assert(game.dmcenter:EnableMouseSync(true,300),"鼠标同步设置失败")
 	assert(game.dmcenter:EnableKeypadSync(true,300),"键盘同步失败")
 
-	game.dmcenter:SetWordGap(10)
+    game.dmcenter:SetWordGap(10)
+    
     --记录服务的数据到文件
     math.randomseed(tostring(os.time()):reverse():sub(1, 6))
 
@@ -37,7 +38,10 @@ function command:Start(hwnd)
     game.data = require "DataManager"
     game.dict = require "DictManager"
     game.cmdcenter = require "CommandCenter"
-
+    game.bag = require "BagManager"
+    game.item = require "ItemManager"
+    game.tip = require "TipManager"
+    game.map = require "MapManager"
 	game.cmdcenter:Start()
 end
 

@@ -38,9 +38,87 @@ end
 function log.warningf(...)
     log.warning(format(...))
 end
+
+function log.capture(x1,y1,x2,y2)
+    local time = os.time()
+	local path = "error/".. os.date("%Y-%m-%d_%H-%M-%S",time) .. ".bmp"
+    skynet.error(x1,y1,x2,y2, path)
+    local success = game.dmcenter:Capture(x1,y1,x2,y2, path)
+	if success then
+        game.log.debugf("截图存放在[%s]",path)
+        return
+    end
+    game.log.debug("截图失败")
+end
+
 function log.errorf(...)
     log.error(format(...))
+    self:Capture(0, 0, 800, 600)
     skynet.exit()
+end
+
+local function dump_value_(v)
+    if type(v) == "string" then
+        v = "\"" .. v .. "\""
+    end
+    return tostring(v)
+end
+
+function log.dump(value, description, nesting)
+    if type(nesting) ~= "number" then nesting = 3 end
+
+    local lookupTable = {}
+    local result = {}
+
+    local traceback = string.split(debug.traceback("", 2), "\n")
+    _log("INFO","dump from: " .. string.trim(traceback[3]))
+
+    local function dump_(value, description, indent, nest, keylen)
+        description = description or "<var>"
+        local spc = ""
+        if type(keylen) == "number" then
+            spc = string.rep(" ", keylen - string.len(dump_value_(description)))
+        end
+        if type(value) ~= "table" then
+            result[#result +1 ] = string.format("%s%s%s = %s", indent, dump_value_(description), spc, dump_value_(value))
+        elseif lookupTable[tostring(value)] then
+            result[#result +1 ] = string.format("%s%s%s = *REF*", indent, dump_value_(description), spc)
+        else
+            lookupTable[tostring(value)] = true
+            if nest > nesting then
+                result[#result +1 ] = string.format("%s%s = *MAX NESTING*", indent, dump_value_(description))
+            else
+                result[#result +1 ] = string.format("%s%s = {", indent, dump_value_(description))
+                local indent2 = indent.."    "
+                local keys = {}
+                local keylen = 0
+                local values = {}
+                for k, v in pairs(value) do
+                    keys[#keys + 1] = k
+                    local vk = dump_value_(k)
+                    local vkl = string.len(vk)
+                    if vkl > keylen then keylen = vkl end
+                    values[k] = v
+                end
+                table.sort(keys, function(a, b)
+                    if type(a) == "number" and type(b) == "number" then
+                        return a < b
+                    else
+                        return tostring(a) < tostring(b)
+                    end
+                end)
+                for i, k in ipairs(keys) do
+                    dump_(values[k], k, indent2, nest + 1, keylen)
+                end
+                result[#result +1] = string.format("%s}", indent)
+            end
+        end
+    end
+    dump_(value, description, "- ", 1)
+
+    for i, line in ipairs(result) do
+        _log("INFO",line)
+    end
 end
 
 return log

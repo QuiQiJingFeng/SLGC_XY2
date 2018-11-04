@@ -6,15 +6,16 @@ local cls = queue()
 local command = {}
 
 function command:MoveToBezier(target)
-    local pos = game.dmcenter:GetCursorPos()
-    local distance = _distance(pos,target)
-    local num = distance/10 * 0.5
-    local list = Bezier:BezierTo(pos,target,num)
-    table.insert(list,target)
-    for i,v in ipairs(list) do
-        game.dmcenter:MoveTo(v.x,v.y)
-        skynet.sleep(1)
-    end
+    -- local pos = game.dmcenter:GetCursorPos()
+    -- local distance = _distance(pos,target)
+    -- local num = distance/10 * 0.5
+    -- local list = Bezier:BezierTo(pos,target,num)
+    -- table.insert(list,target)
+    -- for i,v in ipairs(list) do
+    --     game.dmcenter:MoveTo(v.x,v.y)
+    --     skynet.sleep(1)
+    -- end
+    game.dmcenter:MoveTo(target.x,target.y)
 end
 
 function command:MoveAndClick(response,pos)

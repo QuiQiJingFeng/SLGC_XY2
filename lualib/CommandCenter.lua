@@ -38,7 +38,10 @@ function CommandCenter:TestExecute(cmd,...)
 end
 
 function CommandCenter:Start()
-    game.cmdcenter:Execute("1205")
+    while true do
+        game.cmdcenter:Execute("battle","ESCAPE")
+        skynet.sleep(100)
+    end
 end
 
 

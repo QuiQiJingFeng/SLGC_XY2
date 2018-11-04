@@ -10,16 +10,6 @@ function cmd:Start(sceneName, coordPos, stopArea)
     if not data then
         return
     end
-    --如果相同那么执行小地图移动
-    if string.find(data.name,sceneName)  then
-        if stopArea then
-            return true
-        end
-        local distance = _distance(coordPos,data)
-        if distance <= 10 then
-            return true
-        end
-    end
     self:FlyUp()
     while true do
         for i=1,1 do

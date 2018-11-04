@@ -6,76 +6,76 @@ local cmd = class("cmd", super)
 
 --鬼族使者任务
 function cmd:Execute()
-    -- self:GoTo("长安",_p(374, 16))
-    -- --对话鬼族使者
-    -- game.cmdcenter:Execute("0013", _p(374, 16))
-    -- skynet.sleep(100)
-    -- --移动到昆仑镜的使用位置
-    -- self:GoTo("长安", _p(215, 181))
+    self:GoTo("长安",_p(374, 16))
+    --对话鬼族使者
+    game.cmdcenter:Execute("0013", _p(374, 16))
+    skynet.sleep(100)
+    --移动到昆仑镜的使用位置
+    self:GoTo("长安", _p(215, 181))
 
-	-- HardWareUtil:KeyPad("alt+e")
-	-- local path = "task_icon_close.bmp|task_icon_open.bmp"
-	-- local list = self:RepeatFindEx(10,300, 300, 600, 500, path, "020202",1,0)
-	-- if #list <= 0 then
-	-- 	game.log.debug("没有找到任何一张图片")
-	-- 	return false
-	-- end
-	-- if #list >= 2 then
-	-- 	game.log.debug("失败,找到的图片多于两张")
-	-- 	return false
-	-- end
-	-- local obj = list[1]
-	-- if obj.index == 0 then
-	-- 	obj.x = obj.x + 20
-	-- 	HardWareUtil:MoveAndClick(obj)
-	-- 	skynet.sleep(50)
-	-- end
-	-- --查找到昆仑镜的图片 右键点击
-	-- local pos = self:RepeatFind(10,0, 0, 800, 600, "kunlunjing.bmp", "020202",1,0)
-	-- if not pos then
-	-- 	game.log.warning("没有找到昆仑镜")
-	-- 	return
-	-- end
-	-- HardWareUtil:MoveToRightClick(pos)
-	-- skynet.sleep(200)
+	HardWareUtil:KeyPad("alt+e")
+	local path = "task_icon_close.bmp|task_icon_open.bmp"
+	local list = self:RepeatFindEx(10,300, 300, 600, 500, path, "020202",1,0)
+	if #list <= 0 then
+		game.log.debug("没有找到任何一张图片")
+		return false
+	end
+	if #list >= 2 then
+		game.log.debug("失败,找到的图片多于两张")
+		return false
+	end
+	local obj = list[1]
+	if obj.index == 0 then
+		obj.x = obj.x + 20
+		HardWareUtil:MoveAndClick(obj)
+		skynet.sleep(50)
+	end
+	--查找到昆仑镜的图片 右键点击
+	local pos = self:RepeatFind(10,0, 0, 800, 600, "kunlunjing.bmp", "020202",1,0)
+	if not pos then
+		game.log.warning("没有找到昆仑镜")
+		return
+	end
+	HardWareUtil:MoveToRightClick(pos)
+	skynet.sleep(200)
 
-	-- local text = self:parseTask("职业任务")
-	-- local iter = string.gmatch(text,"(%d+)")
-	-- local x = tonumber(iter())
-    -- local y = tonumber(iter())
-    -- self:GoTo("长安", _p(x, y))
-	-- --寻找武状元
-	-- --对话武状元
-	-- game.cmdcenter:Execute("0013",_p(x, y))
-	-- skynet.sleep(50)
-    -- --战斗检测
-    -- if not game.cmdcenter:TestExecute("0001","FIGHT") then
-    --     game.log.error("战斗检测失败")
-    -- end
+	local text = self:parseTask("职业任务")
+	local iter = string.gmatch(text,"(%d+)")
+	local x = tonumber(iter())
+    local y = tonumber(iter())
+    self:GoTo("长安", _p(x, y))
+	--寻找武状元
+	--对话武状元
+	game.cmdcenter:Execute("0013",_p(x, y))
+	skynet.sleep(50)
+    --战斗检测
+    if not game.cmdcenter:TestExecute("0001","FIGHT") then
+        game.log.error("战斗检测失败")
+    end
 
- 	-- local text = self:parseTask("职业任务")
-	-- local iter = string.gmatch(text,"(%d+)")
-	-- local x = tonumber(iter())
-	-- local y = tonumber(iter())
-    --  --寻路文状元
-    --  self:GoTo("洛阳城", _p(x, y))
-	--  --对话文状元
-    --  game.cmdcenter:Execute("0013",_p(x, y))
+ 	local text = self:parseTask("职业任务")
+	local iter = string.gmatch(text,"(%d+)")
+	local x = tonumber(iter())
+	local y = tonumber(iter())
+     --寻路文状元
+     self:GoTo("洛阳城", _p(x, y))
+	 --对话文状元
+     game.cmdcenter:Execute("0013",_p(x, y))
 
-	-- local find = false
-	-- for i=1,5 do
-	-- 	if self:searchAndClickText("00d011-101010","文采不错") then
-	-- 		find = true
-	-- 		break
-	-- 	end
-	-- 	skynet.sleep(10)
-	-- end
-	-- if not find then
-	-- 	game.log.debug("开始答题失败")
-	-- 	return
-	-- end
-	-- HardWareUtil:MoveTo(_p(400,580))
-	-- skynet.sleep(100)
+	local find = false
+	for i=1,5 do
+		if self:searchAndClickText("00d011-101010","文采不错") then
+			find = true
+			break
+		end
+		skynet.sleep(10)
+	end
+	if not find then
+		game.log.debug("开始答题失败")
+		return
+	end
+	HardWareUtil:MoveTo(_p(400,580))
+	skynet.sleep(100)
 	
     if not self:Dati() then
         return

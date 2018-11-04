@@ -67,6 +67,9 @@ function cmd_base:GetCurAreaAndPosWithCapther()
     return data
 end
 
+
+
+
 --获取当前的飞行状态
 function cmd_base:GetCurFlyState()
     --打开飞行御器 界面
@@ -107,6 +110,9 @@ end
 function cmd_base:RepeatFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
     local pos = nil
     num = num or 1
+    delta_color = delta_color or "000000"
+    sim = sim or 1
+    dir = dir or 0
     for idx = 1, num do
         pos = game.dmcenter:FindPic(x1, y1, x2, y2, pic_name, delta_color, sim, dir)
         if pos.x ~= 0 or pos.y ~= 0 then
@@ -122,6 +128,9 @@ end
 function cmd_base:RepeatFindEx(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
     local ret = ""
     num = num or 1
+    delta_color = delta_color or "000000"
+    sim = sim or 1
+    dir = dir or 0
     for idx = 1, num do
         ret = game.dmcenter:FindPicEx(x1, y1, x2, y2, pic_name, delta_color, sim, dir)
         if ret ~= "" then
@@ -139,6 +148,35 @@ function cmd_base:RepeatFindEx(num, x1, y1, x2, y2, pic_name, delta_color, sim, 
     for _, conf in ipairs(list) do
         local temp = string.split(conf, ",")
         local data = {index = tonumber(temp[1]), x = tonumber(temp[2]), y = tonumber(temp[3])}
+        table.insert(array, data)
+    end
+
+    return array
+end
+
+function cmd_base:RepeatFindExS(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
+    local ret = ""
+    num = num or 1
+    delta_color = delta_color or "000000"
+    sim = sim or 1
+    dir = dir or 0
+    for idx = 1, num do
+        ret = game.dmcenter:FindPicExS(x1, y1, x2, y2, pic_name, delta_color, sim, dir)
+        if ret ~= "" then
+            break
+        end
+        if num ~= idx then
+            skynet.sleep(10)
+        end
+    end
+    if ret == "" then
+        return {}
+    end
+    local array = {}
+    local list = string.split(ret, "|")
+    for _, conf in ipairs(list) do
+        local temp = string.split(conf, ",")
+        local data = {name = temp[1], x = tonumber(temp[2]), y = tonumber(temp[3])}
         table.insert(array, data)
     end
 

@@ -4,11 +4,15 @@ local super = require "commands.base"
 local cmd = class("cmd", super)
 
 
---人族使者任务
-function cmd:Execute()
+function cmd:ChatRenZhuShizhe()
     self:GoTo("长安", _p(383, 12))
     --对话人族使者
     game.cmdcenter:Execute("0013", _p(383, 12))
+end
+
+--人族使者任务
+function cmd:Execute()
+    self:ChatRenZhuShizhe()
     skynet.sleep(100)
 	local list = {
             {name = "大唐边境",pos = _p(170,222)},
@@ -18,8 +22,7 @@ function cmd:Execute()
 	for i,v in ipairs(list) do
 		self:goGetYaoCai(v)
 	end
-    self:GoTo("长安", _p(383, 12))
-    game.cmdcenter:Execute("0013", _p(383, 12))
+    self:ChatRenZhuShizhe()
 
 	return true
 end
