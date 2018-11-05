@@ -136,4 +136,24 @@ function MapManager:GetCurAreaAndPos(checkError)
     return
 end
 
+function MapManager:OpenCurSmallAndClick(pos)
+    self:CloseAllMap()
+    self:OpenCurSmallMap()
+    local data = self:GetCurAreaAndPosWithCapther()
+    local pixelPos = self:ConvertToWordSpace(data.name,pos)
+    HardWareUtil:MoveAndClick(pixelPos)
+    skynet.sleep(50)
+    self:CloseAllMap()
+end
+function MapManager:OpenBigMapToSmallAndClick(name,pos)
+    self:CloseAllMap()
+    self:OpenBigMap()
+    self:OpenSmallMapFromBigMap(data.name)
+    local pixelPos =  game.map:ConvertToWordSpace(data.name, data, true)
+    HardWareUtil:MoveAndClick(pixelPos)
+    skynet.sleep(50)
+    self:CloseAllMap()
+end
+
+
 return MapManager
