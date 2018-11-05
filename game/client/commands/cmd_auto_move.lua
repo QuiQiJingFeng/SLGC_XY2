@@ -27,8 +27,7 @@ function cmd:Execute(tname,tpos,stopArea)
             else
                 HardWareUtil:MoveTo(_p(400,300))
                 skynet.sleep(30)
-                if TIP then
-                    PRTP()
+                if game.tip:CheckYellowArea() then
                     break
                 end
                 game.map:OpenBigMapToSmallAndClick(tname,tpos)
