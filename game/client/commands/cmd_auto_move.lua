@@ -1,5 +1,7 @@
-
-local cmd = {}
+local skynet = require "skynet"
+local HardWareUtil = require "HardWareUtil"
+local super = require "commands.base"
+local cmd = class("cmd", super)
 
 function cmd:CheckExit(tname,tpos,stopArea)
     local nextLoop = true
@@ -16,7 +18,7 @@ end
 function cmd:Execute(tname,tpos,stopArea)
     self:WaitMoveEnd()
     local times = 0
-    while not self:CheckExit(tname,tpos,stopArea) do
+    while self:CheckExit(tname,tpos,stopArea) do
         for i=1,1 do
             if self.__inArea then
                 times = times + 1
