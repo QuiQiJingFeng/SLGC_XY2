@@ -155,5 +155,44 @@ function MapManager:OpenBigMapToSmallAndClick(name,pos)
     self:CloseAllMap()
 end
 
+function MapManager:CheckExit(tname,tpos,stopArea)
+    local nextLoop = true
+    local data = self:GetCurAreaAndPosWithCapther()
+    self.__inArea = tname == data.name
+    if tname == data.name and _distance(data,tpos) == 0 then
+        nextLoop = false
+    elseif tname == data.name and stopArea then
+        nextLoop = false
+    end
+    return nextLoop
+end
 
+function MapManager:GoTo(tname,tpos,stopArea)
+    self:WaitMoveEnd()
+    local times = 0
+    while self:CheckExit(tname,tpos,stopArea) do
+        for i=1,1 do
+            if self.__inArea then
+                times = times + 1
+                if times >= 2 then
+                    self:FlyUp()
+                end
+                self:OpenCurSmallAndClick(tpos)
+            else
+                HardWareUtil:MoveTo(_p(400,300))
+                skynet.sleep(30)
+                if game.tip:CheckYellowArea() then
+                    break
+                end
+                self:OpenBigMapToSmallAndClick(tname,tpos)
+            end
+            self:WaitMoveEnd()
+        end
+    end
+    self:FlyDown()
+end
+
+function MapManager:GoRoomScene(sceneName,npcName)
+    
+end
 return MapManager
