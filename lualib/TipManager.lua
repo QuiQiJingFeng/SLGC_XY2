@@ -27,23 +27,33 @@ function TipManager:CheckYellowArea()
     end
 
     if #list <= 0 then
-        -- game.log.info("没有找到黄色提示")
+        game.log.info("没有找到黄色提示")
         return
     end
     --FYD --TODO
-    local pos = list[1].pos
-    if pos.x < 200 or pos.x > 400 or pos.y < 200 or pos.y > 600 then
-        -- game.log.warning("没有找到深色颜色块,黄色提示无效")
-        return
+    
+    while true do
+        if not list[1] then
+            game.log.warning("没有在指定的区域,黄色提示无效")
+            return
+        end
+        local pos = list[1].pos
+        if pos.x < 100 or pos.x > 600 or pos.y < 100 or pos.y > 600 then
+            table.remove(list,1)
+        else
+            break
+        end
     end
 
+
+    local pos = list[1].pos
     --TODO
     local rect = _rect(pos,50)
     --获取深色颜色块
-    local color = ""
-    local npos = game.dmcenter:FindColorBlock(rect[1], rect[2], rect[3], rect[4], color, 1, 100, 30, 20)
+    local color = "362f1b-101010|433327-101010"
+    local npos = game.dmcenter:FindColorBlock(rect[1], rect[2], rect[3], rect[4], color, 1, 1000, 50, 50)
     if npos.x == 0 and npos.y == 0 then
-        -- game.log.warning("没有找到深色颜色块,黄色提示无效")
+        game.log.warning("没有找到深色颜色块,黄色提示无效")
         return
     end
 
@@ -53,7 +63,7 @@ function TipManager:CheckYellowArea()
     obj.pos.x = obj.pos.x + math.random(10,50)
     obj.pos.y = obj.pos.y + math.random(3,8)
     HardWareUtil:MoveAndClick(obj.pos)
-    skynet.sleep(50)
+    skynet.sleep(100)
 end
 
 return TipManager

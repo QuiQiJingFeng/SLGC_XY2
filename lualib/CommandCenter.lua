@@ -38,7 +38,9 @@ function CommandCenter:TestExecute(cmd,...)
 end
 
 function CommandCenter:Start()
-    game.cmdcenter:Execute("auto_move","地府",_p(80,50),true)
+    -- game.cmdcenter:Execute("auto_move","地府",_p(80,50),true)
+    -- game.map:GoTo("地府",_p(74,54))
+    game.map:GoRoomScene("药店","药店老板")
 end
 
 
