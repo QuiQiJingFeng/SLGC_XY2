@@ -30,12 +30,20 @@ function TipManager:CheckYellowArea()
         game.log.info("没有找到黄色提示")
         return
     end
+
+    local pos = list[1].pos
+    local rect = _rect(pos,50)
+    if pos.x < rect[1] or pos.x > rect[3] or pos.y < rect[2] or pos.y > rect[4] then
+        game.log.warning("没有找到深色颜色块,黄色提示无效")
+        return
+    end
+
     
-    local rect = _rect(list[1].pos,50)
+    
     --获取深色颜色块
     local color = ""
-    local pos = game.dmcenter:FindColorBlock(rect[1], rect[2], rect[3], rect[4], color, 1, 100, 30, 20)
-    if pos.x == 0 and pos.y == 0 then
+    local npos = game.dmcenter:FindColorBlock(rect[1], rect[2], rect[3], rect[4], color, 1, 100, 30, 20)
+    if npos.x == 0 and npos.y == 0 then
         game.log.warning("没有找到深色颜色块,黄色提示无效")
         return
     end
