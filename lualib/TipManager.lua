@@ -31,12 +31,12 @@ function TipManager:CheckYellowArea()
         return
     end
     
-    --找到黄色提示之后 还要判断下是否是有效的地址
-    game.log.infof("查找到黄色提示路标[%s]",list[1].word)
-    local area = list[1].word
-    local check = game.data:CheckInvalidAreaName(area)
-    if not check then
-        game.log.warning("黄色提示无效")
+    local rect = _rect(list[1].pos,50)
+    --获取深色颜色块
+    local color = ""
+    local pos = game.dmcenter:FindColorBlock(rect[1], rect[2], rect[3], rect[4], color, 1, 100, 30, 20)
+    if pos.x == 0 and pos.y == 0 then
+        game.log.warning("没有找到深色颜色块,黄色提示无效")
         return
     end
 
