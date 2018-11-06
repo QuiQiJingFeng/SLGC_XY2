@@ -48,6 +48,8 @@ function TipManager:CheckYellowArea()
     end
 
     local obj = list[1]
+    skynet.error("检测到黄色提示->",obj.word)
+
     obj.pos.x = obj.pos.x + math.random(10,50)
     obj.pos.y = obj.pos.y + math.random(3,8)
     HardWareUtil:MoveAndClick(obj.pos)

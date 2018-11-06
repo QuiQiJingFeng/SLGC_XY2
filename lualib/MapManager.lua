@@ -129,7 +129,6 @@ function MapManager:GetCurAreaAndPos(checkError)
         end
         return {name=name,x=x,y=y}
     end
-    local path = self:Capture(0, 0, 150, 30)
     if checkError then
         game.log.error("获取当前场景的名称、坐标失败")
     end
@@ -148,8 +147,8 @@ end
 function MapManager:OpenBigMapToSmallAndClick(name,pos)
     self:CloseAllMap()
     self:OpenBigMap()
-    self:OpenSmallMapFromBigMap(data.name)
-    local pixelPos =  game.map:ConvertToWordSpace(data.name, data, true)
+    self:OpenSmallMapFromBigMap(name)
+    local pixelPos =  game.map:ConvertToWordSpace(name, pos, true)
     HardWareUtil:MoveAndClick(pixelPos)
     skynet.sleep(50)
     self:CloseAllMap()

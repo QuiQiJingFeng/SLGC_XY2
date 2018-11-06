@@ -6,10 +6,15 @@ local cmd = class("cmd", super)
 function cmd:CheckExit(tname,tpos,stopArea)
     local nextLoop = true
     local data = self:GetCurAreaAndPosWithCapther()
-    self.__inArea = tname == data.name
-    if tname == data.name and _distance(data,tpos) == 0 then
+    self.__inArea = string.find(tname,data.name) and true or false
+    
+    skynet.error("tname = ",tname)
+    skynet.error("name = ",data.name)
+    skynet.error("self.__inArea = ",self.__inArea)
+
+    if self.__inArea and _distance(data,tpos) == 0 then
         nextLoop = false
-    elseif tname == data.name and stopArea then
+    elseif self.__inArea and stopArea then
         nextLoop = false
     end
     return nextLoop
@@ -38,6 +43,7 @@ function cmd:Execute(tname,tpos,stopArea)
         end
     end
     self:FlyDown()
+    return true
 end
 
 return cmd

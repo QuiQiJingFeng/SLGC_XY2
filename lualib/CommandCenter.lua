@@ -38,7 +38,7 @@ function CommandCenter:TestExecute(cmd,...)
 end
 
 function CommandCenter:Start()
-    game.cmdcenter:Execute("make_flag")
+    game.cmdcenter:Execute("auto_move","地府",_p(80,50),true)
 end
 
 
