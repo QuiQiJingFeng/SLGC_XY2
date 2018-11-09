@@ -814,6 +814,18 @@ function _p(x, y)
     return {x = x, y = y}
 end
 
+function _rectInPos(rect,pos)
+	local x1 = rect[1]
+	local y1 = rect[2]
+	local x2 = rect[3]
+	local y2 = rect[4]
+	if pos.x < x1 or pos.x > x2 or pos.y < y1 or pos.y > y2 then
+		return false
+	end
+
+	return true
+end
+
 --获取以pos为中心,unit为半径的矩形
 function _rect(pos,unit)
     local x1 = pos.x - unit

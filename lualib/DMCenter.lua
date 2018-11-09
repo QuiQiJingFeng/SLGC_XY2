@@ -1,4 +1,5 @@
 local CPLUS = require("CPLUS")
+local skynet = require "skynet"
 local DMCenter = {}
 
 ---------------------------键盘鼠标操作--------------------------------------------
@@ -93,6 +94,17 @@ DMCenter["KEY_CODE"] ={
     ["/"]=191,
 }
 
+--x1,y1,x2,y2 --检查鼠标位置的影响
+function DMCenter:checkMousePosEffect(...)
+    local rect = {...}
+    local pos = self:GetCursorPos()
+    if _rectInPos(rect,pos) then
+        local x = pos.x + math.random(10,50)
+        local y = rect[2].y + math.random(50,100)
+        self:MoveTo(x,y)
+        skynet.sleep(30)
+    end
+end
 
 function DMCenter:GBKToUTF8(str)
     return CPLUS.DmCenter.GBKToUTF8(str)
@@ -440,6 +452,7 @@ file 字符串:保存的文件名,保存的地方一般为SetPath中设置的目
      当然这里也可以指定全路径名.
 ]]
 function DMCenter:Capture( x1, y1, x2, y2, file)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.Capture(self.__dm,x1, y1, x2, y2, file) == 1
 end
 
@@ -459,6 +472,7 @@ time 整形数: 总共截取多久的动画，单位毫秒。
 
 ]]
 function DMCenter:CaptureGif( x1, y1, x2, y2, file,delay,time)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.CaptureGif(self.__dm,x1, y1, x2, y2, file,delay,time) == 1
 end
 
@@ -477,6 +491,7 @@ quality 整形数: jpg压缩比率(1-100) 越大图片质量越好
   
 ]]
 function DMCenter:CaptureJpg( x1, y1, x2, y2, file, quality)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.CaptureJpg(self.__dm,x1, y1, x2, y2, file, quality) == 1
 end
 
@@ -493,6 +508,7 @@ file 字符串:保存的文件名,保存的地方一般为SetPath中设置的目
      当然这里也可以指定全路径名.
 ]]
 function DMCenter:CapturePng( x1,y1,x2,y2,file)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.CapturePng(self.__dm,x1,y1,x2,y2,file) == 1
 end
 
@@ -521,6 +537,7 @@ sim 双精度浮点数: 相似度(0.1-1.0)
 1: 颜色不匹配
 ]]
 function DMCenter:CmpColor( x,y,color,sim)
+    self:checkMousePosEffect(x, y, x+50, y+50)
     return CPLUS.DmCenter.CmpColor(self.__dm,x,y,color,sim) == 1
 end
 
@@ -565,6 +582,7 @@ x 变参指针:返回X坐标
 y 变参指针:返回Y坐标  
 ]]
 function DMCenter:FindColor( x1, y1, x2, y2, color, sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindColor(self.__dm,x1, y1, x2, y2, color, sim, dir)
 end
 
@@ -586,6 +604,7 @@ x 变参指针:返回X坐标
 y 变参指针:返回Y坐标 
 ]]
 function DMCenter:FindColorBlock( x1, y1, x2, y2, color, sim, count,width,height)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindColorBlock(self.__dm,x1, y1, x2, y2, color, sim, count,width,height)
 end
 
@@ -618,6 +637,7 @@ Loop
   
 ]]
 function DMCenter:FindColorBlockEx( x1, y1, x2, y2, color, sim, count, width, height)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindColorBlockEx(self.__dm,x1, y1, x2, y2, color, sim, count, width, height)
 end
 
@@ -651,6 +671,7 @@ End If
 
 ]]
 function DMCenter:FindColorE( x1, y1, x2, y2, color, sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindColorE(self.__dm,x1, y1, x2, y2, color, sim, dir)
 end
 
@@ -692,6 +713,7 @@ Do While index < count
 Loop
 ]]
 function DMCenter:FindColorEx( x1, y1, x2, y2, color, sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindColorEx(self.__dm,x1, y1, x2, y2, color, sim, dir)
 end
 
@@ -716,6 +738,7 @@ if dm_ret = 1 then
 end if
 ]]
 function DMCenter:FindMulColor( x1, y1, x2, y2, color, sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindMulColor(self.__dm,x1, y1, x2, y2, color, sim) == 1
 end
 
@@ -740,6 +763,7 @@ x 变参指针:返回X坐标(坐标为first_color所在坐标)
 y 变参指针:返回Y坐标(坐标为first_color所在坐标)
 ]]
 function DMCenter:FindMultiColor( x1, y1, x2, y2,first_color,offset_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindMultiColor(self.__dm,x1, y1, x2, y2,first_color,offset_color,sim, dir)
 end
 
@@ -767,6 +791,7 @@ dir 整形数:查找方向 0: 从左到右,从上到下 1: 从左到右,从下�
 
 ]]
 function DMCenter:FindMultiColorE( x1, y1, x2, y2,first_color,offset_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindMultiColorE(self.__dm,x1, y1, x2, y2,first_color,offset_color,sim, dir)
 end
 
@@ -804,6 +829,7 @@ Loop
 
 ]]
 function DMCenter:FindMultiColorEx( x1, y1, x2, y2,first_color,offset_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindMultiColorEx(self.__dm,x1, y1, x2, y2,first_color,offset_color,sim, dir)
 end
 
@@ -831,6 +857,7 @@ If intX >= 0 and intY >= 0 Then
 End If
 ]]
 function DMCenter:FindPic( x1, y1, x2, y2, pic_name, delta_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindPic(self.__dm,x1, y1, x2, y2, pic_name, delta_color,sim, dir)
 end
 
@@ -861,6 +888,7 @@ End If
 
 ]]
 function DMCenter:FindPicE( x1, y1, x2, y2, pic_name, delta_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindPicE(self.__dm,x1, y1, x2, y2, pic_name, delta_color,sim, dir)
 end
 
@@ -902,6 +930,7 @@ If len(dm_ret) > 0 Then
 End If
 ]]
 function DMCenter:FindPicEx( x1, y1, x2, y2, pic_name, delta_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindPicEx(self.__dm,x1, y1, x2, y2, pic_name, delta_color,sim, dir)
 end
 
@@ -943,6 +972,7 @@ End If
 
 ]]
 function DMCenter:FindPicExS( x1, y1, x2, y2, pic_name, delta_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindPicExS(self.__dm,x1, y1, x2, y2, pic_name, delta_color,sim, dir)
 end
 
@@ -980,6 +1010,7 @@ End If
 
 ]]
 function DMCenter:FindPicMem( x1, y1, x2, y2, pic_info, delta_color,sim, dir,intX, intY)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindPicMem(self.__dm,x1, y1, x2, y2, pic_info, delta_color,sim, dir,intX, intY)
 end
 
@@ -1015,6 +1046,7 @@ End If
 注 : 内存中的图片格式必须是24位色，并且不能加密.
 ]]
 function DMCenter:FindPicMemE( x1, y1, x2, y2, pic_info, delta_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindPicMemE(self.__dm,x1, y1, x2, y2, pic_info, delta_color,sim, dir)
 end
 
@@ -1064,6 +1096,7 @@ End If
 注 : 内存中的图片格式必须是24位色，并且不能加密.
 ]]
 function DMCenter:FindPicMemEx( x1, y1, x2, y2, pic_info, delta_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindPicMemEx(self.__dm,x1, y1, x2, y2, pic_info, delta_color,sim, dir)
 end
 
@@ -1095,6 +1128,7 @@ If intX >= 0 and intY >= 0 Then
 End If
 ]]
 function DMCenter:FindPicS( x1, y1, x2, y2, pic_name, delta_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindPicS(self.__dm,x1, y1, x2, y2, pic_name, delta_color,sim, dir)
 end
 
@@ -1124,6 +1158,7 @@ dm_ret = dm.FindShape(0,0,2000,2000, "1|1|0,1|6|1,0|10|1,9|10|1,7|6|1,7|8|0,8|9|
 dm.MoveTo x,y
 ]]
 function DMCenter:FindShape( x1, y1, x2, y2, offset_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindShape(self.__dm,x1, y1, x2, y2, offset_color,sim, dir)
 end
 
@@ -1151,6 +1186,7 @@ pos = split(pos,"|")
 dm.MoveTo int(pos(0)),int(pos(1))
 ]]
 function DMCenter:FindShapeE( x1, y1, x2, y2, offset_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindShapeE(self.__dm,x1, y1, x2, y2, offset_color,sim, dir)
 end
 
@@ -1186,6 +1222,7 @@ Do While index < count
 Loop
 ]]
 function DMCenter:FindShapeEx( x1, y1, x2, y2,offset_color,sim, dir)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindShapeEx(self.__dm,x1, y1, x2, y2,offset_color,sim, dir)
 end
 
@@ -1251,6 +1288,7 @@ If color = "ffffff" Then
 End If
 ]]
 function DMCenter:GetColor( x,y)
+    self:checkMousePosEffect(x, y, x+50, y+50)
     return CPLUS.DmCenter.GetColor(self.__dm,x,y)
 end
 
@@ -1271,6 +1309,7 @@ end
 
 ]]
 function DMCenter:GetColorBGR( x,y)
+    self:checkMousePosEffect(x, y, x+50, y+50)
     return CPLUS.DmCenter.GetColorBGR(self.__dm,x,y)
 end
 
@@ -1291,6 +1330,7 @@ If color = "100.20.20" Then
 End If
 ]]
 function DMCenter:GetColorHSV( x,y)
+    self:checkMousePosEffect(x, y, x+50, y+50)
     return CPLUS.DmCenter.GetColorHSV(self.__dm,x,y)
 end
 
@@ -1312,6 +1352,7 @@ sim 双精度浮点数:相似度,取值范围0.1-1.0
 TracePrint dm.GetColorNum(0,0,2000,2000,"123456-000000|aabbcc-030303|ddeeff-202020",1.0)
 ]]
 function DMCenter:GetColorNum( x1, y1, x2, y2, color, sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.GetColorNum(self.__dm,x1, y1, x2, y2, color, sim)
 end
 
@@ -1368,6 +1409,7 @@ y2 整形数:区域的右下Y坐标
 
 ]]
 function DMCenter:GetScreenData( x1,y1,x2,y2)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     assert(false,"涉及到二进制的返回,暂无实现")
 end
 
@@ -1393,6 +1435,7 @@ dm.数值方法 (“GetScreenDataBmp”, 0, 0, 100, 200, data, size)
 
 ]]
 function DMCenter:GetScreenDataBmp( x1,y1,x2,y2,data,size)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     assert(false,"涉及到字节流,暂无实现")
 end
 
@@ -1663,6 +1706,7 @@ If len(info) > 0 Then
 End if
 ]]
 function DMCenter:FetchWord( x1, y1, x2, y2, color, word)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FetchWord(self.__dm,x1, y1, x2, y2, color, word)
 end
 
@@ -1709,6 +1753,7 @@ End If
 一般字库字符数量小于100左右，模糊度为1.0时，用FindStr要快一些,否则用FindStrFast.
 ]]
 function DMCenter:FindStr( x1,y1,x2,y2,string,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStr(self.__dm,x1,y1,x2,y2,string,color_format,sim)
 end
 
@@ -1756,6 +1801,7 @@ End If
 一般字库字符数量小于100左右，模糊度为1.0时，用FindStrE要快一些,否则用FindStrFastE.
 ]]
 function DMCenter:FindStrE( x1,y1,x2,y2,string,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrE(self.__dm,x1,y1,x2,y2,string,color_format,sim)
 end
 
@@ -1803,6 +1849,7 @@ End If
 一般字库字符数量小于100左右，模糊度为1.0时，用FindStrEx要快一些,否则用FindStrFastEx.
 ]]
 function DMCenter:FindStrEx( x1,y1,x2,y2,string,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrEx(self.__dm,x1,y1,x2,y2,string,color_format,sim)
 end
 
@@ -1850,6 +1897,7 @@ End If
 一般字库字符数量小于100左右，模糊度为1.0时，用FindStrExS要快一些,否则用FindStrFastExS
 ]]
 function DMCenter:FindStrExS( x1,y1,x2,y2,string,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrExS(self.__dm,x1,y1,x2,y2,string,color_format,sim)
 end
 
@@ -1898,6 +1946,7 @@ End If
 所以，在使用此函数时，也要特别注意这一点。
 ]]
 function DMCenter:FindStrFast( x1,y1,x2,y2,string,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrFast(self.__dm,x1,y1,x2,y2,string,color_format,sim)
 end
 
@@ -1947,6 +1996,7 @@ End If
 所以，在使用此函数时，也要特别注意这一点。
 ]]
 function DMCenter:FindStrFastE( x1,y1,x2,y2,string,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrFastE(self.__dm,x1,y1,x2,y2,string,color_format,sim)
 end
 
@@ -1995,6 +2045,7 @@ End If
 所以，在使用此函数时，也要特别注意这一点。
 ]]
 function DMCenter:FindStrFastEx( x1,y1,x2,y2,string,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrFastEx(self.__dm,x1,y1,x2,y2,string,color_format,sim)
 end
 
@@ -2042,6 +2093,7 @@ End If
 所以，在使用此函数时，也要特别注意这一点。
 ]]
 function DMCenter:FindStrFastExS( x1,y1,x2,y2,string,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrFastExS(self.__dm,x1,y1,x2,y2,string,color_format,sim)
 end
 
@@ -2090,6 +2142,7 @@ End If
 所以，在使用此函数时，也要特别注意这一点。
 ]]
 function DMCenter:FindStrFastS( x1,y1,x2,y2,string,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrFastS(self.__dm,x1,y1,x2,y2,string,color_format,sim)
 end
 
@@ -2134,6 +2187,7 @@ End If
 一般字库字符数量小于100左右，模糊度为1.0时，用FindStrS要快一些,否则用FindStrFastS.
 ]]
 function DMCenter:FindStrS( x1,y1,x2,y2,string,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrS(self.__dm,x1,y1,x2,y2,string,color_format,sim)
 end
 
@@ -2183,6 +2237,7 @@ End If
 注: 对于如何获取字体尺寸以及名字等信息，可以参考视频教程，如何使用系统字库.
 ]]
 function DMCenter:FindStrWithFont( x1,y1,x2,y2,string,color_format,sim,font_name,font_size,flag)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrWithFont(self.__dm,x1,y1,x2,y2,string,color_format,sim,font_name,font_size,flag)
 end
 
@@ -2230,6 +2285,7 @@ End If
 注: 对于如何获取字体尺寸以及名字等信息，可以参考视频教程，如何使用系统字库.
 ]]
 function DMCenter:FindStrWithFontE( x1,y1,x2,y2,string,color_format,sim,font_name,font_size,flag)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrWithFontE(self.__dm,x1,y1,x2,y2,string,color_format,sim,font_name,font_size,flag)
 end
 
@@ -2280,6 +2336,7 @@ End If
 注: 对于如何获取字体尺寸以及名字等信息，可以参考视频教程，如何使用系统字库.
 ]]
 function DMCenter:FindStrWithFontEx( x1,y1,x2,y2,string,color_format,sim,font_name,font_size,flag)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.FindStrWithFontEx(self.__dm,x1,y1,x2,y2,string,color_format,sim,font_name,font_size,flag)
 end
 
@@ -2518,6 +2575,7 @@ Do While index < count
 Loop 
 ]]
 function DMCenter:GetWords( x1, y1, x2, y2, color, sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.GetWords(self.__dm,x1, y1, x2, y2, color, sim)
 end
 
@@ -2527,11 +2585,10 @@ function DMCenter:GetWordsNew( x1, y1, x2, y2, color, sim)
     local list = {}
     local index = 0
     while index < count do
-        local pos = DMCenter:GetWordResultPos(s,index)
+        local data = DMCenter:GetWordResultPos(s,index)
         local word = DMCenter:GetWordResultStr(s,index)
-        word = self:GBKToUTF8(word)
-        local obj = {word = word,pos = pos}
-        table.insert(list,obj)
+        data.word = self:GBKToUTF8(word)
+        table.insert(list,data)
         index = index + 1 
     end
     return list
@@ -2559,6 +2616,7 @@ Do While index < count
 Loop 
 ]]
 function DMCenter:GetWordsNoDict( x1, y1, x2, y2, color)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.GetWordsNoDict(self.__dm,x1, y1, x2, y2, color)
 end
 
@@ -2608,6 +2666,7 @@ MessageBox s
 //注: 在color_fomat最前面加上"b@"表示后面的颜色描述是针对背景色,而非字的颜色.
 ]]
 function DMCenter:Ocr( x1,y1,x2,y2,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     local text = CPLUS.DmCenter.Ocr(self.__dm,x1,y1,x2,y2,color_format,sim)
     return game.dmcenter:GBKToUTF8(text)
 end
@@ -2647,6 +2706,7 @@ Loop
 注: OcrEx不再像Ocr一样,支持换行分割了.
 ]]
 function DMCenter:OcrEx( x1,y1,x2,y2,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.OcrEx(self.__dm,x1,y1,x2,y2,color_format,sim)
 end
 
@@ -2678,6 +2738,7 @@ for i = 1 to ss_len
 next
 ]]
 function DMCenter:OcrExOne( x1,y1,x2,y2,color_format,sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.OcrExOne(self.__dm,x1,y1,x2,y2,color_format,sim)
 end
 
@@ -2702,6 +2763,7 @@ s = dm.OcrInFile(0,0,2000,2000,"test.bmp","000000-000000",1.0)
 MessageBox s
 ]]
 function DMCenter:OcrInFile( x1, y1, x2, y2, pic_name, color_format, sim)
+    self:checkMousePosEffect(x1, y1, x2, y2)
     return CPLUS.DmCenter.OcrInFile(self.__dm,x1, y1, x2, y2, pic_name, color_format, sim)
 end
 
