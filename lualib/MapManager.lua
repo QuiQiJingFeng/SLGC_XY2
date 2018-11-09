@@ -129,7 +129,6 @@ function MapManager:GetCurAreaAndPos(checkError)
         end
         return {name=name,x=x,y=y}
     end
-    local path = self:Capture(0, 0, 150, 30)
     if checkError then
         game.log.error("获取当前场景的名称、坐标失败")
     end
@@ -148,8 +147,8 @@ end
 function MapManager:OpenBigMapToSmallAndClick(name,pos)
     self:CloseAllMap()
     self:OpenBigMap()
-    self:OpenSmallMapFromBigMap(data.name)
-    local pixelPos =  game.map:ConvertToWordSpace(data.name, data, true)
+    self:OpenSmallMapFromBigMap(name)
+    local pixelPos =  game.map:ConvertToWordSpace(name, pos, true)
     HardWareUtil:MoveAndClick(pixelPos)
     skynet.sleep(50)
     self:CloseAllMap()
@@ -159,7 +158,8 @@ function MapManager:CheckExit(tname,tpos,stopArea)
     local nextLoop = true
     local data = self:GetCurAreaAndPosWithCapther()
     self.__inArea = tname == data.name
-    if tname == data.name and _distance(data,tpos) == 0 then
+    skynet.error(self.__inArea,"FYD---",tname,data.name)
+    if tname == data.name and _distance(data,tpos) < 10 then
         nextLoop = false
     elseif tname == data.name and stopArea then
         nextLoop = false
@@ -168,6 +168,7 @@ function MapManager:CheckExit(tname,tpos,stopArea)
 end
 
 function MapManager:GoTo(tname,tpos,stopArea)
+    game.log.infof("寻路开始 [%s]=>[%d,%d]",tname,tpos.x,tpos.y)
     self:WaitMoveEnd()
     local times = 0
     while self:CheckExit(tname,tpos,stopArea) do
@@ -190,9 +191,114 @@ function MapManager:GoTo(tname,tpos,stopArea)
         end
     end
     self:FlyDown()
+    game.log.info("寻路结束")
 end
 
-function MapManager:GoRoomScene(sceneName,npcName)
-    
+
+function MapManager:ClilckFlag(pos)
+    HardWareUtil:MoveAndClick(pos)
+    local success = false
+    for i=1,20 do
+        success = self:searchAndClickText("00d011-101010", "送我去")
+        if success then
+            break
+        end
+        skynet.sleep(10)
+    end
+    if not success then
+        game.log.error("没有找到送我去的提示")
+    end
+    return true
 end
+
+function MapManager:SearchByRedPoint(npcName)
+    game.map:CloseAllMap()
+    self:OpenCurSmallMap()
+    HardWareUtil:SendGBKString(npcName)
+    local pos = self:RepeatFind(10,0,0,800,600,"3.bmp","020202",1,0)
+    if not pos then
+        game.log.error("没有找到该NPC选项")
+    end
+
+    pos.x = pos.x - math.random(50,80)
+    pos.y = pos.y + 30
+    HardWareUtil:MoveAndClick(pos)
+    
+    local path = "4.bmp|5.bmp"
+    local array = self:RepeatFindEx(10,100,100,800,600, path, "020202",1,0)
+    if #array <= 0 then
+        game.log.error("小红点被挡住了")
+    end
+
+    local pos = array[1]
+    HardWareUtil:MoveAndClick(pos)
+    --关闭自己打开的地图
+    game.map:CloseAllMap()
+    return self:WaitMoveEnd()
+end
+
+local CONVERT_NAMES = {
+    ["金銮殿"] = { name = "皇宫",x=139,y=59},
+    ["药店"] = {name = "洛阳城",x=163,y=164},
+    ["杂货店"] = {name = "长安城",x=90,y=155}
+}
+function MapManager:GoRoomScene(sceneName,npcName)
+    local data = CONVERT_NAMES[sceneName]
+    if not data then
+        game.log.error("没有指定的转换配置")
+    end
+    game.map:CloseAllMap()
+    game.map:OpenBigMap()
+    game.map:OpenSmallMapFromBigMap(data.name)
+    local pixelPos =  game.map:ConvertToWordSpace(data.name, data, true)
+    --将鼠标移动到不覆盖旗帜的位置
+    HardWareUtil:MoveTo(_p(pixelPos.x+math.random(30,50),pixelPos.y+math.random(30,50)))
+    
+    local path = "12.bmp"
+    local rect = _rect(pixelPos,30)
+    local list = self:RepeatFindEx(5,rect[1],rect[2],rect[3],rect[4], path, "020202", 1.0, 0)
+    local markFlag = false
+    if #list > 0 then
+        game.log.info("找到黄色飞行棋,直接飞过去")
+        return self:ClilckFlag(list[1])
+    end
+    game.log.info("没有找到飞行棋,自己寻路过去")
+    --如果没有黄色飞行棋,那么寻路过去
+    self:GoTo(data.name,_p(math.random(20,40),math.random(20,40)),true)
+    game.log.infof("到达当前场景,使用小红点的方式查找NPC[%s]",npcName)
+    --小红点找到对应的NPC
+    self:SearchByRedPoint(npcName)
+    game.log.info("到达NPC地点,做个77")
+    --之后设置个旗
+    return self:MakeFlag()
+end
+
+function MapManager:MakeFlag()
+    --打开任务栏1
+    game.bag:OpenBag(1)
+    local CONTENT_RECT = {25,290,345,510}
+    --获取获取所有的孔明灯 以及详细信息
+    local list = game.item:Distinguish("孔明灯",CONTENT_RECT)
+    table.sort(list,function(a,b) 
+        return a.num < b.num
+    end)
+    --循环找到一个 次数大于0 并且num <8的
+    local obj
+    for i,v in ipairs(list) do
+        if v.num < 8 and v.times > 0 then
+            obj = v
+        end
+    end
+    if not obj then
+        return game.log.warning("没有足够的孔明灯可以使用了")
+    end
+    obj.num = obj.num + 1
+    HardWareUtil:MoveToRightClick(obj)
+    if game.tip:Check(10,"做好了") then
+        return true
+    end
+    self:searchAndClickText("00d011-101010", "新增路标")
+    return true
+end
+
 return MapManager
