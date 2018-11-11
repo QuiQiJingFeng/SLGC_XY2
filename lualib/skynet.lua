@@ -834,6 +834,11 @@ function _rect(pos,unit)
     local y2 = pos.y + unit
     x1 = x1 > 0 and x1 or 0
     y1 = y1 > 0 and y1 or 0
+    if not(x2 > x1 and y2 > y1) then
+        game.log.dump(pos,"FYD----x2 > x1 and y2 > y1")
+        game.log.error(unit)
+    end
+    
     return {x1,y1,x2,y2}
 end
 

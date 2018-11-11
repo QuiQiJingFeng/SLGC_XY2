@@ -96,14 +96,14 @@ DMCenter["KEY_CODE"] ={
 
 --x1,y1,x2,y2 --检查鼠标位置的影响
 function DMCenter:checkMousePosEffect(...)
-    local rect = {...}
-    local pos = self:GetCursorPos()
-    if _rectInPos(rect,pos) then
-        local x = pos.x + math.random(10,50)
-        local y = rect[2].y + math.random(50,100)
-        self:MoveTo(x,y)
-        skynet.sleep(30)
-    end
+    -- local rect = {...}
+    -- local pos = self:GetCursorPos()
+    -- if _rectInPos(rect,pos) then
+    --     local x = pos.x + math.random(10,50)
+    --     local y = rect[4] + math.random(50,100)
+    --     self:MoveTo(x,y)
+    --     skynet.sleep(30)
+    -- end
 end
 
 function DMCenter:GBKToUTF8(str)
@@ -1406,11 +1406,43 @@ y2 整形数:区域的右下Y坐标
 
 注意,调用完此接口后，返回的数据指针在当前dm对象销毁时，或者再次调用GetScreenData时，会自动释放.
 从2.1120版本之后，调用完此函数后，没必要再调用FreeScreenData了,插件会自动释放.
-
+--FYD 麻痹的 返回的是BBGGRRFF
 ]]
 function DMCenter:GetScreenData( x1,y1,x2,y2)
     self:checkMousePosEffect(x1, y1, x2, y2)
-    assert(false,"涉及到二进制的返回,暂无实现")
+    local data = CPLUS.DmCenter.GetScreenData(self.__dm,x1,y1,x2,y2)
+    local list = {}
+    local width = x2
+    local idx = 1
+    while true do
+        local bb = string.byte(data,(idx-1)*4 + 1)
+        local gg = string.byte(data,(idx-1)*4 + 2)
+        local rr = string.byte(data,(idx-1)*4 + 3)
+        local rgbcolor = string.format("%02x%02x%02x",rr,gg,bb)
+        local obj = {}
+        obj.color = rgbcolor
+        table.insert(list,obj)
+        idx = idx + 1
+        --因为是闭区间,所以这里要+1
+        if idx > (x2+1-x1)*(y2+1-y1) then
+            break
+        end
+    end
+    local idx = 0
+    for y=y1,y2 do
+        for x=x1,x2 do 
+            idx = idx + 1
+            list[idx].x = x
+            list[idx].y = y
+            
+        end
+    end
+    local result= {}
+    result.list = list
+    function result:get(idx)
+        return list[idx]
+    end
+    return result
 end
 
 

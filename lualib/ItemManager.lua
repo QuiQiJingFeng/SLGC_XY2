@@ -12,10 +12,15 @@ function ItemManager:Distinguish(key,CONTENT_RECT)
     game.dict:ChangeDict("ST_10")
     local path = "items/"..game.dmcenter:UTF8ToGBK(key)..".bmp"
     local list = self:RepeatFindEx(10,CONTENT_RECT[1],CONTENT_RECT[2],CONTENT_RECT[3],CONTENT_RECT[4], path, "020202", 1.0, 0)
+    cache[key] = list
+    return list
+end
+
+function ItemManager:GetKongMingDengDetail(list)
     for _,obj in ipairs(list) do
         HardWareUtil:MoveTo(obj)
         local rect = _rect(obj,300)
-        skynet.sleep(200)
+        skynet.sleep(300)
         local times = game.dmcenter:Ocr(rect[1],rect[2],rect[3],rect[4],"ff0000-101010", 1)
         local iter = string.gmatch(times,"%d+")
         local times = tonumber(iter())
@@ -38,7 +43,7 @@ function ItemManager:Distinguish(key,CONTENT_RECT)
             obj.num = #destributes
         end
     end
-    cache[key] = list
+
     return list
 end
 

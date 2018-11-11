@@ -138,7 +138,7 @@ end
 function MapManager:OpenCurSmallAndClick(pos)
     self:CloseAllMap()
     self:OpenCurSmallMap()
-    local data = self:GetCurAreaAndPosWithCapther()
+    local data = self:GetCurAreaAndPos(true)
     local pixelPos = self:ConvertToWordSpace(data.name,pos)
     HardWareUtil:MoveAndClick(pixelPos)
     skynet.sleep(50)
@@ -148,17 +148,74 @@ function MapManager:OpenBigMapToSmallAndClick(name,pos)
     self:CloseAllMap()
     self:OpenBigMap()
     self:OpenSmallMapFromBigMap(name)
-    local pixelPos =  game.map:ConvertToWordSpace(name, pos, true)
+    local pixelPos =  self:ConvertToWordSpace(name, pos, true)
     HardWareUtil:MoveAndClick(pixelPos)
     skynet.sleep(50)
     self:CloseAllMap()
 end
 
+--检查是否可以飞行
+--name 目标场景名称
+--coordPos 目标坐标
+function MapManager:TestFlyByFlag(name, coordPos,fromBigMap)
+    local data = self:GetCurAreaAndPos(true)
+    local pixelPos = self:ConvertToWordSpace(name, coordPos,fromBigMap)
+    local playerPixelPos = self:ConvertToWordSpace(name, _p(data.x, data.y),fromBigMap)
+
+    HardWareUtil:MoveTo(_p(math.random(750,800),math.random(0,50)))
+    skynet.sleep(50)
+
+    --只检查蓝色飞行棋
+    local list = self:RepeatFindEx(5, 0, 0, 800, 600, "11.bmp", "020202", 1.0, 0)
+    if #list <= 0 then
+        game.log.info("没有飞行棋")
+        return
+    end
+    --为了避免两个旗距离相等,加个0-1的随机数
+    for _, pos in ipairs(list) do
+        pos.wight = _distance(pos, pixelPos) + math.random(0,1)
+    end
+    --将飞行棋按照距离目标点的距离远近进行排序
+    table.sort(list,function(a, b)
+            return a.wight < b.wight
+        end)
+    
+    --飞行之前 先要 降落下来
+    self:FlyDown()
+    --取一个距离目标点最近的旗
+    local flag = list[1]
+    local playerDistance = _distance(playerPixelPos, pixelPos)
+    --旗子跟目标点的距离
+    local flagDistance = flag.wight
+    local canfly = false
+    if name ~= data.name then
+        canfly = true
+    else
+        local delt = 100
+        --如果人物跟目标点的距离 比 旗子到目标点的距离只多100 像素的话不值得飞的
+        --如果飞行棋距离目标点过近，会导致点到飞行棋上,而大于50像素的话是不会将目标点盖住的
+        if playerDistance - flagDistance > delt  or flagDistance <= 50 then
+            canfly = true
+        end
+    end
+    if canfly then
+        HardWareUtil:MoveAndClick(flag)
+        for i=1,20 do
+            local success = self:searchAndClickText("00d011-101010", "送我去")
+            if success then
+                skynet.sleep(100)
+                return true
+            end
+        end
+        skynet.sleep(10)
+    end
+end
+
 function MapManager:CheckExit(tname,tpos,stopArea)
     local nextLoop = true
-    local data = self:GetCurAreaAndPosWithCapther()
+    local data = self:GetCurAreaAndPos(true)
     self.__inArea = tname == data.name
-    skynet.error(self.__inArea,"FYD---",tname,data.name)
+    skynet.error(self.__inArea,"FYD---",data.name,tname)
     if tname == data.name and _distance(data,tpos) < 10 then
         nextLoop = false
     elseif tname == data.name and stopArea then
@@ -167,9 +224,24 @@ function MapManager:CheckExit(tname,tpos,stopArea)
     return nextLoop
 end
 
-function MapManager:GoTo(tname,tpos,stopArea)
+function MapManager:GoTo(tname,tpos,stopArea,makeFlag)
     game.log.infof("寻路开始 [%s]=>[%d,%d]",tname,tpos.x,tpos.y)
     self:WaitMoveEnd()
+    self:CheckExit(tname,tpos,stopArea)
+    if useFlag then
+        local fromBigMap = true
+        if self.__inArea then
+            fromBigMap = false
+            self:OpenCurSmallMap()
+        else
+            self:CloseAllMap()
+            self:OpenBigMap()
+            self:OpenSmallMapFromBigMap(tname)
+        end
+        --寻路开始之前先检查一下能不能直接飞过去
+        makeFlag = makeFlag and not self:TestFlyByFlag(tname, tpos,fromBigMap)
+    end
+
     local times = 0
     while self:CheckExit(tname,tpos,stopArea) do
         for i=1,1 do
@@ -192,6 +264,11 @@ function MapManager:GoTo(tname,tpos,stopArea)
     end
     self:FlyDown()
     game.log.info("寻路结束")
+    if makeFlag then
+        game.log.info("插旗")
+        return self:MakeFlag()
+    end
+    return true
 end
 
 
@@ -210,30 +287,9 @@ function MapManager:ClilckFlag(pos)
     end
     return true
 end
-
+--小红点查找NPC
 function MapManager:SearchByRedPoint(npcName)
-    game.map:CloseAllMap()
-    self:OpenCurSmallMap()
-    HardWareUtil:SendGBKString(npcName)
-    local pos = self:RepeatFind(10,0,0,800,600,"3.bmp","020202",1,0)
-    if not pos then
-        game.log.error("没有找到该NPC选项")
-    end
-
-    pos.x = pos.x - math.random(50,80)
-    pos.y = pos.y + 30
-    HardWareUtil:MoveAndClick(pos)
-    
-    local path = "4.bmp|5.bmp"
-    local array = self:RepeatFindEx(10,100,100,800,600, path, "020202",1,0)
-    if #array <= 0 then
-        game.log.error("小红点被挡住了")
-    end
-
-    local pos = array[1]
-    HardWareUtil:MoveAndClick(pos)
-    --关闭自己打开的地图
-    game.map:CloseAllMap()
+    self:CloseAllMap()
     return self:WaitMoveEnd()
 end
 
@@ -247,10 +303,10 @@ function MapManager:GoRoomScene(sceneName,npcName)
     if not data then
         game.log.error("没有指定的转换配置")
     end
-    game.map:CloseAllMap()
-    game.map:OpenBigMap()
-    game.map:OpenSmallMapFromBigMap(data.name)
-    local pixelPos =  game.map:ConvertToWordSpace(data.name, data, true)
+    self:CloseAllMap()
+    self:OpenBigMap()
+    self:OpenSmallMapFromBigMap(data.name)
+    local pixelPos =  self:ConvertToWordSpace(data.name, data, true)
     --将鼠标移动到不覆盖旗帜的位置
     HardWareUtil:MoveTo(_p(pixelPos.x+math.random(30,50),pixelPos.y+math.random(30,50)))
     
@@ -274,11 +330,14 @@ function MapManager:GoRoomScene(sceneName,npcName)
 end
 
 function MapManager:MakeFlag()
+    HardWareUtil:MoveTo(_p(700,400))
+    skynet.sleep(50)
     --打开任务栏1
     game.bag:OpenBag(1)
     local CONTENT_RECT = {25,290,345,510}
     --获取获取所有的孔明灯 以及详细信息
     local list = game.item:Distinguish("孔明灯",CONTENT_RECT)
+    list = game.item:GetKongMingDengDetail(list)
     table.sort(list,function(a,b) 
         return a.num < b.num
     end)
@@ -295,10 +354,96 @@ function MapManager:MakeFlag()
     obj.num = obj.num + 1
     HardWareUtil:MoveToRightClick(obj)
     if game.tip:Check(10,"做好了") then
+        game.log.info("插旗完成")
+        game.bag:CloseBag()
         return true
     end
     self:searchAndClickText("00d011-101010", "新增路标")
+    game.log.info("插旗完成")
+    game.bag:CloseBag()
     return true
+end
+
+--获取当前角色的实际屏幕坐标 --1个坐标==20 像素
+function MapManager:getPlayerPixelPos()
+    local size = game.dmcenter:GetClientSize()
+    local center = _p(math.ceil(size.width / 2), math.ceil(size.height / 2))
+    local data = self:GetCurAreaAndPos(true)
+    local conf = game.data:GetSmallMapByName(data.name)
+    local unit = 20
+    local mapSize = _size(conf.width * unit, conf.height * unit)
+    local x, y
+    local curRealPos = _p(data.x * unit, data.y * unit)
+    if curRealPos.x >= size.width / 2 and curRealPos.x <= mapSize.width - (size.width / 2) then
+        x = center.x
+    end
+    if curRealPos.y >= size.height / 2 and curRealPos.y <= mapSize.height - (size.height / 2) then
+        y = center.y
+    end
+
+    if curRealPos.x < size.width / 2 then
+        x = curRealPos.x
+    end
+    if curRealPos.x > mapSize.width - (size.width / 2) then
+        x = size.width - (mapSize.width - curRealPos.x)
+    end
+
+    if curRealPos.y < size.height / 2 then
+        y = size.height - curRealPos.y
+    end
+
+    if curRealPos.y > mapSize.height - (size.height / 2) then
+        y = size.height - size.height / 2 - (mapSize.height - curRealPos.y) + center.y
+    end
+    return _p(x, y)
+end
+
+--查找对话标志,旁边才能使用
+function MapManager:ChatPos(coordPos,type)
+	local data = self:GetCurAreaAndPos(true)
+	local dx = (coordPos.x - data.x) * 20
+	local dy = (data.y - coordPos.y) * 20
+	local playerPixelPos = self:getPlayerPixelPos()
+	if not playerPixelPos then
+		return game.log.error("获取玩家像素位置失败")
+	end
+	local x = playerPixelPos.x + dx
+	local y = playerPixelPos.y + dy
+
+	local targetCPos = _p(x,y)
+
+	local findChat = false
+	local unit = 10
+    for i=1,10 do
+        local px = math.random(0,1) > 0.5 and 1 or -1
+        local dx = math.random(5,10) * px
+		HardWareUtil:MoveTo(_p(targetCPos.x+dx,targetCPos.y))
+		skynet.sleep(20)
+		if type == "finger" then
+	    	local path = "finger_1.bmp"
+	    	local pos = game.dmcenter:FindPic(0,0,800,600,path,"020202",1,0.8)
+	      	if pos.x ~= 0 or pos.y ~= 0 then
+	      		findChat = true
+	      		break
+	      	end
+	    else
+	    	local path = "chat_1.bmp|chat_2.bmp|chat_3.bmp|chat_4.bmp"
+		    local ret = game.dmcenter:FindPicExS(0,0,800,600, path, "020202", 1, 0)
+		    if not (ret == "") then
+                findChat = true
+                targetCPos.x = targetCPos.x + dx
+		    	break
+		    end
+	    end
+	   	targetCPos.y = targetCPos.y - unit
+	end
+    if not findChat then
+        game.log.error("没有找到对话图标")
+		return
+	end
+    HardWareUtil:MoveAndClick(targetCPos)
+    skynet.sleep(50)
+	return true
 end
 
 return MapManager
