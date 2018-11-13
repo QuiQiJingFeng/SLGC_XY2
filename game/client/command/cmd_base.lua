@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local cmd_base = {}
 
-function cmd_base:loopCall(num,ptime,func)
+function cmd_base:LoopCall(num,ptime,func)
     num = num or 1
     ptime = ptime or 10
     for i=1,num do
@@ -11,16 +11,16 @@ function cmd_base:loopCall(num,ptime,func)
     end
 end
 
-function cmd_base:repeateFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir,time)
-    return self:loopCall(num,time,function() 
+function cmd_base:RepeateFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir,time)
+    return self:LoopCall(num,time,function() 
         local pos = game.dmcenter:FindPic(x1, y1, x2, y2, pic_name, delta_color, sim, dir)
         if pos.x ~= 0 or pos.y ~= 0 then return end
         return pos
     end)
 end
 
-function cmd_base:repeateFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir,time)
-    return self:loopCall(num,time,function()
+function cmd_base:RepeateFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir,time)
+    return self:LoopCall(num,time,function()
             local ret = game.dmcenter:FindPicEx(x1, y1, x2, y2, pic_name, delta_color, sim, dir)
             if ret == "" then return end
             local array = {}
@@ -35,8 +35,8 @@ function cmd_base:repeateFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,di
     end)
 end
 
-function cmd_base:repeateFindExS(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir,time)
-    return self:loopCall(num,time,function() 
+function cmd_base:RepeateFindExS(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir,time)
+    return self:LoopCall(num,time,function() 
         local ret = game.dmcenter:FindPicExS(x1, y1, x2, y2, pic_name, delta_color, sim, dir)
         if ret == "" then return end
         local array = {}
@@ -51,9 +51,9 @@ function cmd_base:repeateFindExS(num, x1, y1, x2, y2, pic_name, delta_color, sim
     end)
 end
 
-function cmd_base:repeateSearchWords(num,font,text,x1, y1, x2, y2,corlor_format,sim,time)
+function cmd_base:RepeateSearchWords(num,font,text,x1, y1, x2, y2,corlor_format,sim,time)
     game.dict:ChangeDict(font)
-    return self:loopCall(num,time,function()
+    return self:LoopCall(num,time,function()
         local list = game.dmcenter:GetWordsNew(x1, y1, x2, y2, corlor_format, sim)
         if #list <= 0 then return end
         for _, obj in pairs(list) do
@@ -64,25 +64,25 @@ function cmd_base:repeateSearchWords(num,font,text,x1, y1, x2, y2,corlor_format,
     end)
 end
 
-function cmd_base:repeateNoFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir,time)
-    return self:loopCall(num,time,function() 
-        return not self:repeateFind(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
+function cmd_base:RepeateNoFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir,time)
+    return self:LoopCall(num,time,function() 
+        return not self:RepeateFind(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
     end)
 end
 
-function cmd_base:repeateNoFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir,time)
-    return self:loopCall(num,time,function() 
-        return not self:repeateFindEx(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
+function cmd_base:RepeateNoFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir,time)
+    return self:LoopCall(num,time,function() 
+        return not self:RepeateFindEx(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
     end)
 end
 
-function cmd_base:repeateNoFindExS(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir,time)
-    return self:loopCall(num,time,function() 
-        return not self:repeateFindExS(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
+function cmd_base:RepeateNoFindExS(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir,time)
+    return self:LoopCall(num,time,function() 
+        return not self:RepeateFindExS(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
     end)
 end
 
-function cmd_base:parseTask(taskName,corlor_format)
+function cmd_base:ParseTask(taskName,corlor_format)
     HardWareUtil:KeyPad("alt+q")
     skynet.sleep(50)
     local list
@@ -135,4 +135,36 @@ function cmd_base:parseTask(taskName,corlor_format)
     
     return str
 end
+
+function cmd_base:ErrorProcess(battleType)
+    battleType = battleType or "FIGHT"
+    --错误处理函数
+    --无法获取场景名称的情况有两种
+    --1、进入战斗的时候不会显示
+    --2、当被遮挡的时候会有问题
+    --先检测是否是战斗导致的,如果是则处理战斗,战斗参数设置为逃跑
+    game.log.info("获取场景名称失败,尝试进入战斗")
+    if not game.cmdcenter:TestExecute("battle", battleType) then
+        game.log.error("进入战斗失败,遇到未知的情况")
+    else
+        return "FIGHT" --战斗处理完成
+    end
+end
+
+function cmd_base:WaitMoveEnd(battleType)
+    local prePos = _p(0, 0)
+    while true do
+        local pos = game.map:GetCurAreaAndPos()
+        if not pos then
+            return self:ErrorProcess(battleType)
+        end
+        local dist = _distance(prePos, pos)
+        if dist == 0 then
+            return "MOVE_END"
+        end
+        prePos = pos
+        skynet.sleep(100)
+    end
+end
+
 return cmd_base

@@ -3,7 +3,7 @@ local HardWareUtil = require "HardWareUtil"
 local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
-function cmd:execute()
+function cmd:Execute()
     
 end
 
@@ -14,7 +14,7 @@ end
 function cmd:Execute()
     self:GoTo("长安",_p(374, 16))
     --对话鬼族使者
-    game.cmdcenter:Execute("0013", _p(374, 16))
+    game.cmdcenterExecute("0013", _p(374, 16))
     skynet.sleep(100)
     --移动到昆仑镜的使用位置
     self:GoTo("长安", _p(215, 181))
@@ -45,28 +45,28 @@ function cmd:Execute()
     HardWareUtil:MoveToRightClick(pos)
     skynet.sleep(200)
 
-    local text = self:parseTask("职业任务")
+    local text = self:ParseTask("职业任务")
     local iter = string.gmatch(text,"(%d+)")
     local x = tonumber(iter())
     local y = tonumber(iter())
     self:GoTo("长安", _p(x, y))
     --寻找武状元
     --对话武状元
-    game.cmdcenter:Execute("0013",_p(x, y))
+    game.cmdcenterExecute("0013",_p(x, y))
     skynet.sleep(50)
     --战斗检测
     if not game.cmdcenter:TestExecute("0001","FIGHT") then
         game.log.error("战斗检测失败")
     end
 
-    local text = self:parseTask("职业任务")
+    local text = self:ParseTask("职业任务")
     local iter = string.gmatch(text,"(%d+)")
     local x = tonumber(iter())
     local y = tonumber(iter())
      --寻路文状元
      self:GoTo("洛阳城", _p(x, y))
      --对话文状元
-     game.cmdcenter:Execute("0013",_p(x, y))
+     game.cmdcenterExecute("0013",_p(x, y))
 
     local find = false
     for i=1,5 do
@@ -88,7 +88,7 @@ function cmd:Execute()
     end
     self:GoTo("长安",_p(374, 16))
     --对话鬼族使者
-    game.cmdcenter:Execute("0013", _p(374, 16))
+    game.cmdcenterExecute("0013", _p(374, 16))
     return true
 end
 

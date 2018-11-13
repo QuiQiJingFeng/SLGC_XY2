@@ -296,7 +296,8 @@ end
 local CONVERT_NAMES = {
     ["金銮殿"] = { name = "皇宫",x=139,y=59},
     ["药店"] = {name = "洛阳城",x=163,y=164},
-    ["杂货店"] = {name = "长安城",x=90,y=155}
+    ["杂货店"] = {name = "长安城",x=90,y=155},
+    ["狮子洞"] = {name = "狮驼岭",x=40,y=30}
 }
 function MapManager:GoRoomScene(sceneName,npcName)
     local data = CONVERT_NAMES[sceneName]

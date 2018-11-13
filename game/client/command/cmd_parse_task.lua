@@ -9,12 +9,12 @@ local TASK_LIST = {
 }
 
 
-function cmd:execute()
-    local text = self:parseTask("ZYRW")
+function cmd:Execute()
+    local text = self:ParseTask("ZYRW")
     for key,value in pairs(TASK_LIST) do
         if string.find(text,value) then
             local cmd = string.lower(key)
-            return game.cmdcenter:execute(cmd)
+            return game.cmdcenterExecute(cmd)
         end
     end
 end
@@ -36,10 +36,10 @@ end
 -- end
 
 -- function cmd:update()
---  local str = self:parseTask("职业任务")
+--  local str = self:ParseTask("职业任务")
 --  if not str then
 --      --如果领取任务失败则跳出职业任务流程
---      local ret = CommandCenter:Execute("1201")
+--      local ret = CommandCenterExecute("1201")
 --      if ret == "FINISH" then
 --          return "FINISH"
 --      elseif ret ~= "SUCCESS" then
@@ -48,7 +48,7 @@ end
 --      skynet.sleep(40)
 --      HardWareUtil:MoveTo(_p(600,300))
 --      skynet.sleep(10)
---      str = self:parseTask("职业任务")
+--      str = self:ParseTask("职业任务")
 --  end
 --  if not str then
 --      skynet.error("FYD--->>>str = ",str)
@@ -64,23 +64,23 @@ end
 -- function cmd:processTask(str)
 --  local result = false
 --  if string.find(str,"勾魂马面") then
---      result = CommandCenter:Execute("1203")
+--      result = CommandCenterExecute("1203")
 --  elseif string.find(str,"鬼族使者") then
---      result = CommandCenter:Execute("1204")
+--      result = CommandCenterExecute("1204")
 --  elseif string.find(str,"人族使者") then
---      result = CommandCenter:Execute("1205")
+--      result = CommandCenterExecute("1205")
 --  elseif string.find(str,"袁天罡") then
---      result = CommandCenter:Execute("1206")
+--      result = CommandCenterExecute("1206")
 --  elseif string.find(str,"道士") then
---      result = CommandCenter:Execute("1207")
+--      result = CommandCenterExecute("1207")
 --  elseif string.find(str,"李世民") then
---      result = CommandCenter:Execute("1208")
+--      result = CommandCenterExecute("1208")
 --  elseif string.find(str,"信使") then
---      result = CommandCenter:Execute("1209")
+--      result = CommandCenterExecute("1209")
 --  elseif string.find(str,"孙悟空") then
---      result = CommandCenter:Execute("1210")
+--      result = CommandCenterExecute("1210")
 --  elseif string.find(str,"大大王") then
---      result = CommandCenter:Execute("1211")
+--      result = CommandCenterExecute("1211")
 --  end
 
 --  return result

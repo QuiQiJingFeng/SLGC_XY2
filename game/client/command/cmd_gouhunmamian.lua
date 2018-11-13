@@ -3,7 +3,7 @@ local HardWareUtil = require "HardWareUtil"
 local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
-function cmd:execute()
+function cmd:Execute()
     
 end
 
@@ -16,23 +16,23 @@ function cmd:Execute()
     self:GoTo("轮回司", _p(58, 28))
     
     --2、对话话勾魂使者
-    game.cmdcenter:Execute("0013",_p(57, 33))
+    game.cmdcenterExecute("0013",_p(57, 33))
     skynet.sleep(100)
     --获取任务描述
-    local npcName = self:parseTask("职业任务")
+    local npcName = self:ParseTask("职业任务")
     game.log.infof("NPC->[%s]",npcName)
     local select =  game.data:GetNPCMapByName(npcName)
     if not select then
         game.log.warningf("NPC [%s]配置不存在", npcName)
         return
     end
-    game.cmdcenter:Execute("0012",select.area,_p(select.x + 3, select.y + 3),true)
+    game.cmdcenterExecute("0012",select.area,_p(select.x + 3, select.y + 3),true)
     
     --小红点找人
     game.cmdcenter:TestExecute("0010",npcName)
 
     --检测是否移动停止,停止则返回
-    game.cmdcenter:Execute("0001","FIGHT")
+    game.cmdcenterExecute("0001","FIGHT")
 
     local find = false
     for i=1,30 do

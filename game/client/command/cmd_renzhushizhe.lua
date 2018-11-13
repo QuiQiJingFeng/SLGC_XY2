@@ -3,7 +3,7 @@ local HardWareUtil = require "HardWareUtil"
 local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
-function cmd:execute()
+function cmd:Execute()
     
 end
 
@@ -13,7 +13,7 @@ end
 function cmd:ChatRenZhuShizhe()
     self:GoTo("长安", _p(383, 12))
     --对话人族使者
-    game.cmdcenter:Execute("0013", _p(383, 12))
+    game.cmdcenterExecute("0013", _p(383, 12))
 end
 
 --人族使者任务
@@ -43,10 +43,10 @@ function cmd:goGetYaoCai(conf)
         local zf = math.random(0,1) > 0.5 and 1 or -1
         x = data.x + math.random(10,20) * zf
         y = data.y + math.random(10,20) * zf
-        game.cmdcenter:Execute("0011",data.name,_p(x,y))
+        game.cmdcenterExecute("0011",data.name,_p(x,y))
         --检测是否移动停止,停止则返回
-        local ret = game.cmdcenter:Execute("0001","FIGHT")
-        game.cmdcenter:Execute("0006")
+        local ret = game.cmdcenterExecute("0001","FIGHT")
+        game.cmdcenterExecute("0006")
         if self:checkIsHasYaoCai() then
             skynet.error("找到药材")
             return true
@@ -71,7 +71,7 @@ function cmd:goGetYaoCai(conf)
     --      HardWareUtil:MoveToRightClick(curPos)
     --      for i=1,10 do
     --          --检测战斗
-    --          if game.cmdcenter:Execute("1107","zhandou") then
+    --          if game.cmdcenterExecute("1107","zhandou") then
     --              if self:checkIsHasYaoCai() then
     --                  skynet.error("找到药材")
     --                  return true

@@ -3,8 +3,8 @@ local HardWareUtil = require "HardWareUtil"
 local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
-function cmd:execute(battleType)
-    local pos = self:repeateFind(30000, 730, 400, 800, 470, "in_battle.bmp","000000",1,0)
+function cmd:Execute(battleType)
+    local pos = self:RepeateFind(30000, 730, 400, 800, 470, "in_battle.bmp","000000",1,0)
     if not pos then
         return
     end
@@ -12,7 +12,7 @@ function cmd:execute(battleType)
     while true do
         for i=1,1 do
             skynet.sleep(10)
-            local pos = self:repeateFind(1, 730, 400, 800, 470, "in_battle.bmp","000000",1,0)
+            local pos = self:RepeateFind(1, 730, 400, 800, 470, "in_battle.bmp","000000",1,0)
             
             if not pos then
                 game.log.info("[[战斗结束]]")
@@ -20,7 +20,7 @@ function cmd:execute(battleType)
             end
 
             --回合开始
-            local pos = self:repeateFind(1, 676, 200, 767, 440, "huihekaishi.bmp","000000",1,0)
+            local pos = self:RepeateFind(1, 676, 200, 767, 440, "huihekaishi.bmp","000000",1,0)
             if not pos then
                 break
             end
@@ -41,7 +41,7 @@ cmd["FIGHT"] = function(self)
     local pos = game.dmcenter:GetCursorPos()
     local rect = _rect(pos,30)
     local path = self:metchResource("jinzhi",".bmp")
-    self:repeateFindEx(10,rect[1],rect[2],rect[3],rect[4],path,"000000",1,0)
+    self:RepeateFindEx(10,rect[1],rect[2],rect[3],rect[4],path,"000000",1,0)
 
     --获取颜色块
     local pos = game.dmcenter:FindColorBlock(0, 75, 339, 460, "004b00-101010|007b00-101010", 1, 50, 30, 20)
@@ -117,10 +117,10 @@ cmd["FIGHT"] = function(self)
         local path1 = self:metchResource("fashu",".bmp")
         local path2 = self:metchResource("jinzhi",".bmp")
         local path = path1.."|"..path2
-        local result = self:repeateFindEx(10,rect[1],rect[2],rect[3],rect[4],path,"000000",1,0,1)
+        local result = self:RepeateFindEx(10,rect[1],rect[2],rect[3],rect[4],path,"000000",1,0,1)
         if not result then
             find = true
-            local pos = self:repeateFind(10, 700, 300, 800, 350, "baohu.bmp","000000",1,0)
+            local pos = self:RepeateFind(10, 700, 300, 800, 350, "baohu.bmp","000000",1,0)
             if pos then
                 HardWareUtil:KeyPad("alt+a")
             end
@@ -136,7 +136,7 @@ end
 cmd["ESCAPE"] = function(self)
     HardWareUtil:MoveTo(_p(400+math.random(50),300+math.random(50)))
     local path = "taopao.bmp"
-    local pos = self:repeateFind(5, 676, 200, 767, 440, path, "020202", 1, 0)
+    local pos = self:RepeateFind(5, 676, 200, 767, 440, path, "020202", 1, 0)
     if not pos then
         game.log.debug("查找逃跑图片失败")
         return
@@ -152,7 +152,7 @@ cmd["CATCH"] = function(self)
     local path2 = self:metchResource("master/yegui",".bmp")
     local path = path1.."|"..path2
     local find = nil
-    local list = self:repeateFindEx(100, 0, 75, 339, 460, path,"020202",0.95,0,1)
+    local list = self:RepeateFindEx(100, 0, 75, 339, 460, path,"020202",0.95,0,1)
     if list and #list > 0 then
         find = list[1]
     end
@@ -163,7 +163,7 @@ cmd["CATCH"] = function(self)
     end
     local master_pos = find
     local path = "buzhuo.bmp"
-    local pos = self:repeateFind(5, 676, 200, 767, 440, path, "020202", 1, 0)
+    local pos = self:RepeateFind(5, 676, 200, 767, 440, path, "020202", 1, 0)
     if not pos then
         game.log.debug("查找捕捉按钮失败")
         return
