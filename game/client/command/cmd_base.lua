@@ -30,7 +30,7 @@ function cmd_base:repeateFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,di
                 table.insert(array, data)
             end
             if #array <= 0 then return end
-            return true
+            return array
     end)
 end
 
@@ -46,7 +46,7 @@ function cmd_base:repeateFindExS(num, x1, y1, x2, y2, pic_name, delta_color, sim
             table.insert(array, data)
         end
         if #array <= 0 then return end
-        return true
+        return array
     end)
 end
 
@@ -62,5 +62,24 @@ function cmd_base:repeateSearchWords(num,font,text,x1, y1, x2, y2,corlor_format,
         end
     end)
 end
+
+function cmd_base:repeateNoFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
+    return self:loopCall(num,10,function() 
+        return not self:repeateFind(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
+    end)
+end
+
+function cmd_base:repeateNoFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir)
+    return self:loopCall(num,10,function() 
+        return not self:repeateFindEx(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
+    end)
+end
+
+function cmd_base:repeateNoFindExS(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir)
+    return self:loopCall(num,10,function() 
+        return not self:repeateFindExS(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
+    end)
+end
+
 
 return cmd_base
