@@ -9,14 +9,19 @@ function ItemManager:Distinguish(key,CONTENT_RECT)
     if cache[key] then
         return cache[key]
     end
-    game.dict:ChangeDict("ST_10")
+    
     local path = "items/"..game.dmcenter:UTF8ToGBK(key)..".bmp"
     local list = self:RepeatFindEx(10,CONTENT_RECT[1],CONTENT_RECT[2],CONTENT_RECT[3],CONTENT_RECT[4], path, "020202", 1.0, 0)
+    if #list <= 0 then
+        game.log.error("item num <= 0")
+    end
     cache[key] = list
+
     return list
 end
 
 function ItemManager:GetKongMingDengDetail(list)
+    game.dict:ChangeDict("ST_10")
     for _,obj in ipairs(list) do
         HardWareUtil:MoveTo(obj)
         local rect = _rect(obj,300)

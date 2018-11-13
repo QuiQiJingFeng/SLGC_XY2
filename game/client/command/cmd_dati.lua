@@ -4,7 +4,26 @@ local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
 function cmd:Execute()
-    
+    HardWareUtil:KeyPad("alt+f")
+    skynet.sleep(100)
+    HardWareUtil:MoveAndClick(_p(700,135))
+    skynet.sleep(100)
+    HardWareUtil:SendGBKString(text)
+    HardWareUtil:KeyPad("enter")
+    skynet.sleep(100)
+    HardWareUtil:MoveTo(_p(0,0))
+    HardWareUtil:KeyPad("alt+f")
+    skynet.sleep(100)
+    HardWareUtil:KeyPad("alt+f")
+    local obj,list = self:RepeateSearchWords(1,"ST_10",text,150,100,600,500,"ffffff-000000",1)
+    skynet.sleep(100)
+    HardWareUtil:MoveToRightClick(_p(520,130))
+    for idx,value in ipairs(list) do
+        if value == obj then
+            return list[idx + 1].word
+        end
+    end
+    return false
 end
 
 --[[

@@ -3,8 +3,35 @@ local HardWareUtil = require "HardWareUtil"
 local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
-function cmd:Execute()
-    
+function cmd:Execute(name,num)
+    --[[
+        game.map:GoRoomScene("药店","药店老板")
+        local obj = self:RepeateSearchWords(30,"ST_11","买点东西",100, 125, 650, 500,"00d011-000000",1)
+        if not obj then
+            game.log.error("没有找到选项")
+        end
+        local newname = game.dmcenter:UTF8ToGBK(name)
+        local path = "items/"..newname..".bmp"
+        local pos = self:RepeatFind(10, 0, 0, 800, 600, path, "020202", 1, 0)
+        if not pos then
+            game.log.warningf("没有找到对应的药品[%s]",name)
+            return
+        end
+        for i=1,num do
+           HardWareUtil:MoveAndClick(pos)
+           skynet.sleep(math.ceil(1,5))
+        end
+        local path = "goumai.bmp"
+        local pos = self:RepeatFind(10, 0, 0, 800, 600, path, "020202", 1, 0)
+        if not pos then
+            game.log.warning("洛阳药店找不到购买按钮")
+            return
+        end
+        HardWareUtil:MoveAndClick(pos)
+        skynet.sleep(20)
+        return true
+
+    ]]
 end
 
 

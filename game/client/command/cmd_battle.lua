@@ -4,7 +4,7 @@ local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
 function cmd:Execute(battleType)
-    local pos = self:RepeateFind(30000, 730, 400, 800, 470, "in_battle.bmp","000000",1,0)
+    local pos = self:RepeateFind(30, 730, 400, 800, 470, "in_battle.bmp","000000",1,0)
     if not pos then
         return
     end

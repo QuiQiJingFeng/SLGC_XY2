@@ -4,13 +4,17 @@ local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
 function cmd:Execute()
-    --game.map:GoTo("方寸山",_p(35, 13),false,true)
-    --game.map:ChatPos(_p(35, 13))
+    game.map:GoTo("方寸山",_p(35, 13),false,true)
+    game.map:ChatPos(_p(35, 13))
 
-    --game.map:GoTo("地狱迷宫一层",_p(20, 7),true,true)
+    game.map:GoTo("地狱迷宫一层",_p(20, 7),true,true)
+    if self:Process() then
+        game.map:GoTo("方寸山",_p(35, 13),false,true)
+        game.map:ChatPos(_p(35, 13))
+        return true
+    end
 end
 
---[[
 function cmd:process()
     local list = {
         {"地狱迷宫一层", _p(40, 20)},
@@ -19,7 +23,7 @@ function cmd:process()
  
     local idx = 1
     while true do
-        game.map:GoTo(list[idx][1],list[idx][2],false,false)
+        game.map:GoTo(list[idx][1],list[idx][2],true,false)
         local ret = self:WaitMoveEnd("CATCH")
         if ret == "FIGHT" then
             local text = self:ParseTask("职业任务")
@@ -33,7 +37,6 @@ function cmd:process()
         end
     end
 end
-]]
 
 --[[
 

@@ -4,10 +4,43 @@ local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
 function cmd:Execute()
-    
+    --[[
+        game.map:GoRoomScene("金銮殿","李世民")
+        game.map:GoTo("斧头帮",_p(50, 50),true,true)
+        if self:process() then
+            game.map:GoRoomScene("金銮殿","李世民")
+            return true
+        end
+        return
+    ]]
 end
 
-
+function cmd:process()
+    -- local list = {
+    --      _p(30, 100),
+    --      _p(100, 30)
+    -- }
+    -- local index = 1
+    -- while true do
+    --     if index == 3 then
+    --         index = 1
+    --     end
+    --     local pos = list[index]
+    --     local x = pos.x + math.random(1,5)
+    --     local y = pos.y + math.random(1,5)
+    --     game.map:GoTo("斧头帮",_p(x,y),true)
+    --     local ret = self:WaitMoveEnd("FIGHT")
+    --     --检测是否移动停止,停止则返回
+    --     if ret == "FIGHT" then
+    --         local text = self:ParseTask("职业任务")
+    --         if string.find(text, "李世民") then
+    --             return true
+    --         end
+    --     else
+    --         index = index + 1
+    --     end
+    -- end
+end
 --[[
 
 --李世民任务
@@ -64,10 +97,9 @@ function cmd:process()
         local pos = list[index]
         local x = pos.x + math.random(1,5)
         local y = pos.y + math.random(1,5)
-        game.cmdcenterExecute("0011","斧头帮",_p(x,y))
+        game.map:GoTo("斧头帮",_p(x,y),true)
+        local ret = self:WaitMoveEnd("FIGHT")
         --检测是否移动停止,停止则返回
-        local ret = game.cmdcenterExecute("0001","FIGHT")
-        skynet.error(ret)
         if ret == "FIGHT" then
             local text = self:ParseTask("职业任务")
             if string.find(text, "李世民") then

@@ -58,7 +58,7 @@ function cmd_base:RepeateSearchWords(num,font,text,x1, y1, x2, y2,corlor_format,
         if #list <= 0 then return end
         for _, obj in pairs(list) do
             if string.find(obj.word,text) then
-                return obj
+                return obj,list
             end
         end
     end)

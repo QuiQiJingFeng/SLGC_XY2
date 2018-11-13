@@ -68,6 +68,12 @@ function command:MoveTo(response,pos)
 	response(true,true)
 end
 
+function command:MoveToEx(response,pos,width,height)
+    game.dmcenter:SetWindowState(1)  --激活窗口
+    self:MoveToEx(pos.x,pos.y,width,height)
+    response(true,true)
+end
+
 function command:InitDM(cmd, dm, hwnd, ...)
 	local func = assert(command[cmd])
 	game.dmcenter:Init(dm, hwnd)
