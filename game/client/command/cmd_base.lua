@@ -1,3 +1,4 @@
+local skynet = require "skynet"
 local cmd_base = {}
 
 function cmd_base:loopCall(num,ptime,func)
@@ -10,18 +11,18 @@ function cmd_base:loopCall(num,ptime,func)
     end
 end
 
-function cmd_base:repeateFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
-    return self:loopCall(num,10,function() 
+function cmd_base:repeateFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir,time)
+    return self:loopCall(num,time,function() 
         local pos = game.dmcenter:FindPic(x1, y1, x2, y2, pic_name, delta_color, sim, dir)
         if pos.x ~= 0 or pos.y ~= 0 then return end
         return pos
     end)
 end
 
-function cmd_base:repeateFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir)
-    return self:loopCall(num,10,function()
+function cmd_base:repeateFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir,time)
+    return self:loopCall(num,time,function()
             local ret = game.dmcenter:FindPicEx(x1, y1, x2, y2, pic_name, delta_color, sim, dir)
-            if ret ~= "" then return end
+            if ret == "" then return end
             local array = {}
             local list = string.split(ret, "|")
             for _, conf in ipairs(list) do
@@ -34,10 +35,10 @@ function cmd_base:repeateFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,di
     end)
 end
 
-function cmd_base:repeateFindExS(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
-    return self:loopCall(num,10,function() 
+function cmd_base:repeateFindExS(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir,time)
+    return self:loopCall(num,time,function() 
         local ret = game.dmcenter:FindPicExS(x1, y1, x2, y2, pic_name, delta_color, sim, dir)
-        if ret ~= "" then return end
+        if ret == "" then return end
         local array = {}
         local list = string.split(ret, "|")
         for _, conf in ipairs(list) do
@@ -50,9 +51,9 @@ function cmd_base:repeateFindExS(num, x1, y1, x2, y2, pic_name, delta_color, sim
     end)
 end
 
-function cmd_base:repeateSearchWords(num,font,text,x1, y1, x2, y2,corlor_format,sim)
+function cmd_base:repeateSearchWords(num,font,text,x1, y1, x2, y2,corlor_format,sim,time)
     game.dict:ChangeDict(font)
-    return self:loopCall(num,10,function()
+    return self:loopCall(num,time,function()
         local list = game.dmcenter:GetWordsNew(x1, y1, x2, y2, corlor_format, sim)
         if #list <= 0 then return end
         for _, obj in pairs(list) do
@@ -63,20 +64,20 @@ function cmd_base:repeateSearchWords(num,font,text,x1, y1, x2, y2,corlor_format,
     end)
 end
 
-function cmd_base:repeateNoFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
-    return self:loopCall(num,10,function() 
+function cmd_base:repeateNoFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir,time)
+    return self:loopCall(num,time,function() 
         return not self:repeateFind(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
     end)
 end
 
-function cmd_base:repeateNoFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir)
-    return self:loopCall(num,10,function() 
+function cmd_base:repeateNoFindEx(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir,time)
+    return self:loopCall(num,time,function() 
         return not self:repeateFindEx(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
     end)
 end
 
-function cmd_base:repeateNoFindExS(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir)
-    return self:loopCall(num,10,function() 
+function cmd_base:repeateNoFindExS(num, x1, y1, x2, y2, pic_name,delta_color,sim,dir,time)
+    return self:loopCall(num,time,function() 
         return not self:repeateFindExS(1, x1, y1, x2, y2, pic_name, delta_color, sim, dir)
     end)
 end
