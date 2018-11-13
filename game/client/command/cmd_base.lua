@@ -82,5 +82,57 @@ function cmd_base:repeateNoFindExS(num, x1, y1, x2, y2, pic_name,delta_color,sim
     end)
 end
 
+function cmd_base:parseTask(taskName,corlor_format)
+    HardWareUtil:KeyPad("alt+q")
+    skynet.sleep(50)
+    local list
+    local select = nil
+    for i = 1, 5 do
+        list = game.dmcenter:GetWordsNew(149, 160, 149 + 149, 234 + 160, "ffffff-101010|d2d000-303030|989413-303030", 1)
+        for i, obj in ipairs(list) do
+            if string.find(obj.word, taskName) then
+                select = obj
+                break
+            end
+        end
+        if select then
+            break
+        end
+        local hasOpen = false
+        for i = #list, 1, -1 do
+            local obj = list[i]
+            if string.find(obj.word, "★") then
+                HardWareUtil:MoveAndClick(obj.pos)
+                hasOpen = true
+            end
+        end
+ 
+        if not hasOpen then
+            HardWareUtil:KeyPad("alt+q")
+            skynet.sleep(50)
+            return
+        end
+        HardWareUtil:MoveTo(_p(math.random(600,800),math.random(400,500)))
+        skynet.sleep(10)
+    end
+    if not select then
+        HardWareUtil:KeyPad("alt+q")
+        skynet.sleep(50)
+        return
+    end
 
+    if string.find(select.word, "☆") then
+        HardWareUtil:MoveAndClick(select.pos)
+        skynet.sleep(20)
+    end
+    select.pos.y = select.pos.y + 20
+    HardWareUtil:MoveAndClick(select.pos)
+    skynet.sleep(20)
+    corlor_format = corlor_format or "00ff00-101010"
+    local str = game.dmcenter:Ocr(371, 158, 275 + 371, 293 + 158, corlor_format, 1)
+    HardWareUtil:KeyPad("alt+q")
+    skynet.sleep(50)
+    
+    return str
+end
 return cmd_base
