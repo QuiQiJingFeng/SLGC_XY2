@@ -1,12 +1,19 @@
 local skynet = require "skynet"
 local HardWareUtil = require "HardWareUtil"
-local super = require "commands.base"
+local super = require "command.cmd_base"
 local cmd = class("cmd", super)
+
+function cmd:execute()
+    
+end
+
+
+--[[
 
 --李世民任务
 function cmd:Execute()
-	self:GoToWithYellow("皇宫",_p(126, 50),nil,"李世民",_p(68,40))
-	skynet.sleep(50)
+    self:GoToWithYellow("皇宫",_p(126, 50),nil,"李世民",_p(68,40))
+    skynet.sleep(50)
 
     --打开斧头帮的小地图
     game.cmdcenter:Execute("0009","斧头帮",_p(50, 50),false)
@@ -18,11 +25,11 @@ function cmd:Execute()
     --检测是否移动停止,停止则返回
     game.cmdcenter:Execute("0001","FIGHT")
 
-	if self:process() then
-		self:GoToWithYellow("皇宫",_p(126, 50),nil,"李世民",_p(68,40))
-	end
+    if self:process() then
+        self:GoToWithYellow("皇宫",_p(126, 50),nil,"李世民",_p(68,40))
+    end
 
-	return true
+    return true
 end
 
 function cmd:ChatLiShiMin()
@@ -45,9 +52,9 @@ function cmd:ChatLiShiMin()
 end
 
 function cmd:process()
-	local list = {
-		 _p(30, 100),
-		 _p(100, 30)
+    local list = {
+         _p(30, 100),
+         _p(100, 30)
     }
     local index = 1
     while true do
@@ -71,4 +78,6 @@ function cmd:process()
         end
     end
 end
+]]
+
 return cmd

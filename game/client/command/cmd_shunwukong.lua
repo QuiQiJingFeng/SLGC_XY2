@@ -1,5 +1,15 @@
 local skynet = require "skynet"
 local HardWareUtil = require "HardWareUtil"
+local super = require "command.cmd_base"
+local cmd = class("cmd", super)
+
+function cmd:execute()
+    
+end
+
+--[[
+local skynet = require "skynet"
+local HardWareUtil = require "HardWareUtil"
 local super = require "commands.base"
 local cmd = class("cmd", super)
 
@@ -11,10 +21,10 @@ function cmd:Execute()
     --对话孙悟空
     game.cmdcenter:Execute("0013",_p(30, 54))
     skynet.sleep(100)
-	local text = self:parseTask("职业任务","ff0000-000000")
-	local iter = string.gmatch(text, "(.-)%(1%)")
-	local name = iter()
-	local iter = string.gmatch(text, "(%d+)")
+    local text = self:parseTask("职业任务","ff0000-000000")
+    local iter = string.gmatch(text, "(.-)%(1%)")
+    local name = iter()
+    local iter = string.gmatch(text, "(%d+)")
     local num = tonumber(iter())
     --买药啊
     game.cmdcenter:Execute("0015",name,num)
@@ -23,7 +33,11 @@ function cmd:Execute()
     --对话紫霞
     game.cmdcenter:Execute("0013",_p(311, 35))
     skynet.sleep(100)
-	return self:searchAndClickText("00d011-000000", "病")
+    return self:searchAndClickText("00d011-000000", "病")
 end
+
+return cmd
+]]
+
 
 return cmd

@@ -1,7 +1,14 @@
 local skynet = require "skynet"
 local HardWareUtil = require "HardWareUtil"
-local super = require "commands.base"
+local super = require "command.cmd_base"
 local cmd = class("cmd", super)
+
+function cmd:execute()
+    
+end
+
+
+--[[
 
 --洛阳购买指定的药品
 function cmd:Execute(name,num)
@@ -41,4 +48,12 @@ function cmd:Execute(name,num)
     skynet.sleep(20)
     return true
 end
+]]
+
+
 return cmd
+
+
+
+
+
