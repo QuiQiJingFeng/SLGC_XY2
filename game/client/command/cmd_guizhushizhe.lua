@@ -4,37 +4,40 @@ local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
 function cmd:Execute()
-    --[[
-        game.map:GoTo("长安",_p(374, 16),false,true)
-        game.map:ChatPos(_p(374, 16))
-        game.map:GoTo("长安",_p(215, 181),false,true)
-        game.bag:OpenBag("t")
-        local list = game.item:Distinguish("昆仑镜",{0, 0, 800, 600})
-        local obj = list[1]
-        HardWareUtil:MoveToRightClick(pos)
-        skynet.sleep(100)
-        local text = self:ParseTask("职业任务")
-        local iter = string.gmatch(text,"(%d+)")
-        local x = tonumber(iter())
-        local y = tonumber(iter())
-        game.map:GoTo("长安",_p(x, y))
-        game.map:ChatPos(_p(x, y))
-        game.cmdcenter:Execute("battle","FIGHT")
+        -- game.map:GoTo("长安",_p(374, 16),false,true)
+        -- game.map:ChatPos(_p(374, 16))
+        -- game.map:GoTo("长安",_p(215, 181),false,true)
+        -- game.bag:OpenBag("t")
+        -- local list = game.item:Distinguish("昆仑镜",{0, 0, 800, 600})
+        -- local obj = list[1]
+        -- HardWareUtil:MoveToRightClick(obj)
+        -- skynet.sleep(100)
+        -- local text = self:ParseTask("职业任务")
+        -- local iter = string.gmatch(text,"(%d+)")
+        -- local x = tonumber(iter())
+        -- local y = tonumber(iter())
+        -- game.map:GoTo("长安",_p(x, y))
+        -- game.map:ChatPos(_p(x, y))
+        -- game.cmdcenter:Execute("battle","FIGHT")
 
-        local text = self:ParseTask("职业任务")
-        local iter = string.gmatch(text,"(%d+)")
-        local x = tonumber(iter())
-        local y = tonumber(iter())
-        game.map:GoTo("洛阳城",_p(x, y))
-        game.map:ChatPos(_p(x, y))
-
-        local obj = self:RepeateSearchWords(10,"ST_11","文采不错",100, 125, 650, 500,"00d011-101010",1)
-        if not obj then
-            game.log.error("开始答题失败")
-        end
- 
-        HardWareUtil:MoveTo(_p(600,580))
-        skynet.sleep(100)
+        -- local text = self:ParseTask("职业任务")
+        -- local iter = string.gmatch(text,"(%d+)")
+        -- local x = tonumber(iter())
+        -- local y = tonumber(iter())
+        -- game.map:GoTo("洛阳城",_p(x, y))
+        -- game.map:ChatPos(_p(x, y))
+        -- HardWareUtil:MoveTo(_p(700,50))
+        -- local obj = self:RepeateSearchWords(10,"ST_11","文采不错",100, 125, 650, 500,"00d011-101010",1)
+        -- if not obj then
+        --     game.log.error("开始答题失败")
+        -- else
+        --     HardWareUtil:MoveAndClick(obj)
+        -- end
+        -- skynet.sleep(100)
+        -- HardWareUtil:MoveTo(_p(700,50))
+        -- skynet.sleep(10)
+        -- HardWareUtil:MoveTo(_p(700,55))
+        -- skynet.sleep(100)
     
         if not self:Dati() then
             game.log.error("答题失败")
@@ -42,36 +45,36 @@ function cmd:Execute()
         game.map:GoTo("长安",_p(374, 16),false,true)
         game.map:ChatPos(_p(374, 16))
         return true
-    ]]
 end
 
 function cmd:Dati()
-    -- while true do
-    --     game.dict:ChangeDict("ST_11")
-    --     local list = game.dmcenter:GetWordsNew(133, 232, 662,378,"00d011-101010|ffffff-000000",1)
-    --     if #list <= 0 then
-    --         game.log.debug("识别诗词完毕,没有找到新的诗词")
-    --         return true
-    --     end
-    --     if string.find(list[1].word,"真厉害") then
-    --         return true
-    --     end
-    --     local value = game.cmdcenter:Execute("dati",list[1].word)
-    --     local finish = false
-    --     for i,v in ipairs(list) do
-    --         if string.find(v.word,value) then
-    --             HardWareUtil:MoveAndClick(v.pos)
-    --             finish = true
-    --         end
-    --     end
-    --     if not finish then
-    --         game.log.debug("没有找到匹配的诗词")
-    --         return
-    --     end
-    --     skynet.sleep(50)
-    --     HardWareUtil:MoveTo(_p(600,580))
-    --     skynet.sleep(200)
-    -- end
+    while true do
+        game.dict:ChangeDict("ST_11")
+        local list = game.dmcenter:GetWordsNew(133, 232, 662,378,"00d011-101010|ffffff-000000",1)
+        if #list <= 0 then
+            game.log.debug("识别诗词完毕,没有找到新的诗词")
+            return true
+        end
+        if string.find(list[1].word,"真厉害") then
+            return true
+        end
+        local value = game.cmdcenter:Execute("dati",list[1].word)
+        skynet.sleep(100)
+        local finish = false
+        for i,v in ipairs(list) do
+            if string.find(v.word,value) then
+                HardWareUtil:MoveAndClick(v)
+                finish = true
+            end
+        end
+        if not finish then
+            game.log.debug("没有找到匹配的诗词")
+            return
+        end
+        skynet.sleep(50)
+        HardWareUtil:MoveTo(_p(600,580))
+        skynet.sleep(200)
+    end
 end
 
 --[[
@@ -86,7 +89,7 @@ function cmd:Execute()
 
     HardWareUtil:KeyPad("alt+e")
     local path = "task_icon_close.bmp|task_icon_open.bmp"
-    local list = self:RepeatFindEx(10,300, 300, 600, 500, path, "020202",1,0)
+    local list = self:RepeateFindEx(10,300, 300, 600, 500, path, "020202",1,0)
     if #list <= 0 then
         game.log.debug("没有找到任何一张图片")
         return false
@@ -103,7 +106,7 @@ function cmd:Execute()
     end
 
     --查找到昆仑镜的图片 右键点击
-    local pos = self:RepeatFind(10,0, 0, 800, 600, "kunlunjing.bmp", "020202",1,0)
+    local pos = self:RepeateFind(10,0, 0, 800, 600, "kunlunjing.bmp", "020202",1,0)
     if not pos then
         game.log.warning("没有找到昆仑镜")
         return

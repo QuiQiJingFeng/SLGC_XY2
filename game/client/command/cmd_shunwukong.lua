@@ -10,7 +10,7 @@ end
 --[[
 local skynet = require "skynet"
 local HardWareUtil = require "HardWareUtil"
-local super = require "commands.base"
+local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
 

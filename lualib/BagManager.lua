@@ -1,6 +1,6 @@
 local HardWareUtil = require "HardWareUtil"
 local skynet = require "skynet"
-local super = require "commands.base"
+local super = require "command.cmd_base"
 local BagManager = class("BagManager", super)
 local RECT = {330,290,377,488}
 --打开指定ID的物品栏,确认打开后返回
@@ -8,8 +8,8 @@ local RECT = {330,290,377,488}
 function BagManager:OpenBag(id)
     local path = "bag/t_open.bmp|bag/t_close.bmp"
 
-    local list = self:RepeatFindExS(1,RECT[1],RECT[2],RECT[3],RECT[4], path, "020202", 1.0, 0)
-    if #list <= 0 then
+    local list = self:RepeateFindExS(1,RECT[1],RECT[2],RECT[3],RECT[4], path, "020202", 1.0, 0)
+    if not list or #list <= 0 then
         --如果物品栏处于关闭状态
         HardWareUtil:KeyPad("alt+e")
     end
@@ -28,8 +28,8 @@ function BagManager:OpenBag(id)
     table.insert(array,"bag/".."t_close.bmp")
     table.insert(array,"bag/".."t_open.bmp")
     local path = table.concat(array,"|")
-    local list = self:RepeatFindExS(50,RECT[1],RECT[2],RECT[3],RECT[4], path, "020202", 1.0, 0)
-    if #list <= 0 then
+    local list = self:RepeateFindExS(50,RECT[1],RECT[2],RECT[3],RECT[4], path, "020202", 1.0, 0)
+    if not list or #list <= 0 then
         game.log.error("打开物品栏失败")
     end
     
@@ -58,13 +58,13 @@ function BagManager:Select(id)
     HardWareUtil:MoveAndClick(obj)
 
     local check = "bag/"..key.."open.bmp"
-    return self:RepeatFind(50,RECT[1],RECT[2],RECT[3],RECT[4], check, "020202", 1.0, 0)
+    return self:RepeateFind(50,RECT[1],RECT[2],RECT[3],RECT[4], check, "020202", 1.0, 0)
 end
 
 function BagManager:CloseBag()
     self.__list = nil
     local path = "bag/t_open.bmp|bag/t_close.bmp"
-    local list = self:RepeatFindExS(1,RECT[1],RECT[2],RECT[3],RECT[4], path, "020202", 1.0, 0)
+    local list = self:RepeateFindExS(1,RECT[1],RECT[2],RECT[3],RECT[4], path, "020202", 1.0, 0)
     if #list > 0 then
         --如果物品栏处于打开状态
         HardWareUtil:KeyPad("alt+e")
@@ -75,7 +75,7 @@ end
 function BagManager:Sort()
     local rect = {225,266,385,330}
     local path = "bag/sort.bmp"
-    local pos = self:RepeatFind(10,rect[1],rect[2],rect[3],rect[4], path, "020202", 1.0, 0)
+    local pos = self:RepeateFind(10,rect[1],rect[2],rect[3],rect[4], path, "020202", 1.0, 0)
     if not pos then
         game.log.error("排序物品栏失败")
     end
@@ -83,7 +83,7 @@ function BagManager:Sort()
     pos.y = pos.y + math.random(4,8)
     HardWareUtil:MoveAndClick(pos)
     path = "bag/sort_all.bmp"
-    local pos = self:RepeatFind(10,rect[1],rect[2],rect[3],rect[4], path, "020202", 1.0, 0)
+    local pos = self:RepeateFind(10,rect[1],rect[2],rect[3],rect[4], path, "020202", 1.0, 0)
     if not pos then
         game.log.error("排序物品栏失败")
     end

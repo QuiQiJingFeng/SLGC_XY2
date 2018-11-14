@@ -1,35 +1,38 @@
 local HardWareUtil = require "HardWareUtil"
 local skynet = require "skynet"
-local super = require "commands.base"
+local super = require "command.cmd_base"
 local MapManager = class("MapManager", super)
 
 --检查大地图是否打开
 function MapManager:CheckBigMapOpen(num)
     num = num or 1
-    local bigOpen = self:RepeatFind(num, 80, 500, 130, 530, "1.bmp", "020202", 1, 0)
+    local bigOpen = self:RepeateFind(num, 80, 500, 130, 530, "1.bmp", "020202", 1, 0)
     return bigOpen and true or false
 end
 --检查小地图是否打开
 function MapManager:CheckSmallMapOpen(num)
     num = num or 1
-    local smallOpen = self:RepeatFind(num, 0, 0, 800, 600, "2.bmp", "020202", 1, 0)
+    local smallOpen = self:RepeateFind(num, 0, 0, 800, 600, "2.bmp", "020202", 1, 0)
     return smallOpen and true or false
 end
 
 --打开大地图
 function MapManager:OpenBigMap()
+    game.log.info("打开大地图")
 	HardWareUtil:KeyPad("alt+2")
-	return self:IsBigMapOpen(10)
+	return self:CheckBigMapOpen(10)
 end
 
 --打开当前场景的小地图
 function MapManager:OpenCurSmallMap()
+    game.log.info("打开当前小地图")
     HardWareUtil:KeyPad("alt+1")
 	return self:CheckSmallMapOpen(10) and true or false
 end
 
 --关闭大地图和小地图
 function MapManager:CloseAllMap()
+    game.log.info("关闭所有地图")
     local smallClose = false
 	local smallOpen = self:CheckSmallMapOpen()
 	if smallOpen then
@@ -66,7 +69,7 @@ function MapManager:OpenSmallMapFromBigMap(name)
     local y = data.y + math.random(0,data.dy)
     HardWareUtil:MoveAndClick(_p(x, y))
     --检测小地图是否打开
-    if not self:IsSmallMapOpen(10) then
+    if not self:CheckSmallMapOpen(10) then
         game.log.error("没有检测到小地图打开")
     end
 end
@@ -75,8 +78,8 @@ end
 function MapManager:ConvertToWordSpace(name, pos, fromBigMap)
     local data = game.data:GetSmallMapByName(name)
     local path = "6.bmp|7.bmp"
-    local list = self:RepeatFindEx(10,0,0,800,600, path, "020202", 1, 0)
-    if #list <= 1 then
+    local list = self:RepeateFindEx(10,0,0,800,600, path, "020202", 1, 0)
+    if not list or #list <= 1 then
         game.log.error("没有找到小地图边界,无法进行坐标到像素的转换 length="..#list)
     end
     --大地图打开像大雁塔那样的场景时需要特殊处理
@@ -157,6 +160,7 @@ end
 --检查是否可以飞行
 --name 目标场景名称
 --coordPos 目标坐标
+--@return 目标位置是否有飞行棋
 function MapManager:TestFlyByFlag(name, coordPos,fromBigMap)
     local data = self:GetCurAreaAndPos(true)
     local pixelPos = self:ConvertToWordSpace(name, coordPos,fromBigMap)
@@ -166,7 +170,7 @@ function MapManager:TestFlyByFlag(name, coordPos,fromBigMap)
     skynet.sleep(50)
 
     --只检查蓝色飞行棋
-    local list = self:RepeatFindEx(5, 0, 0, 800, 600, "11.bmp", "020202", 1.0, 0)
+    local list = self:RepeateFindEx(5, 0, 0, 800, 600, "11.bmp", "020202", 1.0, 0)
     if #list <= 0 then
         game.log.info("没有飞行棋")
         return
@@ -198,27 +202,28 @@ function MapManager:TestFlyByFlag(name, coordPos,fromBigMap)
             canfly = true
         end
     end
+
     if canfly then
         HardWareUtil:MoveAndClick(flag)
-        for i=1,20 do
-            local success = self:searchAndClickText("00d011-101010", "送我去")
-            if success then
-                skynet.sleep(100)
-                return true
-            end
+        HardWareUtil:MoveTo(_p(700,50))
+        local obj = self:RepeateSearchWords(10,"ST_11","送我去",96, 127, 587+96, 362+127,"00d011-101010",1)
+        if not obj then
+            game.log.error("没有找到[送我去]文字")
         end
-        skynet.sleep(10)
+        HardWareUtil:MoveAndClick(obj)
+        skynet.sleep(100)
     end
+    game.log.infof("距离为:%d",flagDistance)
+    return flagDistance <= 30
 end
 
 function MapManager:CheckExit(tname,tpos,stopArea)
     local nextLoop = true
     local data = self:GetCurAreaAndPos(true)
     self.__inArea = tname == data.name
-    skynet.error(self.__inArea,"FYD---",data.name,tname)
-    if tname == data.name and _distance(data,tpos) < 10 then
+    if self.__inArea and _distance(data,tpos) < 10 then
         nextLoop = false
-    elseif tname == data.name and stopArea then
+    elseif self.__inArea and stopArea then
         nextLoop = false
     end
     return nextLoop
@@ -228,7 +233,7 @@ function MapManager:GoTo(tname,tpos,stopArea,makeFlag)
     game.log.infof("寻路开始 [%s]=>[%d,%d]",tname,tpos.x,tpos.y)
     self:WaitMoveEnd()
     self:CheckExit(tname,tpos,stopArea)
-    if useFlag then
+    if makeFlag then
         local fromBigMap = true
         if self.__inArea then
             fromBigMap = false
@@ -240,6 +245,7 @@ function MapManager:GoTo(tname,tpos,stopArea,makeFlag)
         end
         --寻路开始之前先检查一下能不能直接飞过去
         makeFlag = makeFlag and not self:TestFlyByFlag(tname, tpos,fromBigMap)
+        
     end
 
     local times = 0
@@ -274,22 +280,36 @@ end
 
 function MapManager:ClilckFlag(pos)
     HardWareUtil:MoveAndClick(pos)
-    local success = false
-    for i=1,20 do
-        success = self:searchAndClickText("00d011-101010", "送我去")
-        if success then
-            break
-        end
-        skynet.sleep(10)
-    end
-    if not success then
+    local obj = self:RepeateSearchWords(10,"ST_11","送我去",96, 127, 587+96, 362+127,"00d011-101010",1)
+    if not obj then
         game.log.error("没有找到送我去的提示")
     end
+    HardWareUtil:MoveAndClick(obj)
+    skynet.sleep(50)
     return true
 end
 --小红点查找NPC
 function MapManager:SearchByRedPoint(npcName)
     self:CloseAllMap()
+    self:OpenCurSmallMap()
+	HardWareUtil:SendGBKString(npcName)
+    local pos = self:RepeateFind(10,100,100,800,600,"3.bmp","020202",1,0)
+    if not pos then
+        game.log.error("没有找到该NPC选项")
+    end
+    pos.x = pos.x - math.random(50,80)
+    pos.y = pos.y + 30
+    HardWareUtil:MoveAndClick(pos)
+    skynet.sleep(50)
+
+    local path = "4.bmp|5.bmp"
+    local array = self:RepeateFindEx(5,100,100,800,600, path, "020202",1,0)
+    if not array or #array <= 0 then
+        game.log.error("小红点被挡住了")
+    end
+
+    local pos = array[1]
+    HardWareUtil:MoveAndClick(pos)
     return self:WaitMoveEnd()
 end
 
@@ -313,9 +333,8 @@ function MapManager:GoRoomScene(sceneName,npcName)
     
     local path = "12.bmp"
     local rect = _rect(pixelPos,30)
-    local list = self:RepeatFindEx(5,rect[1],rect[2],rect[3],rect[4], path, "020202", 1.0, 0)
-    local markFlag = false
-    if #list > 0 then
+    local list = self:RepeateFindEx(5,rect[1],rect[2],rect[3],rect[4], path, "020202", 1.0, 0)
+    if list and #list > 0 then
         game.log.info("找到黄色飞行棋,直接飞过去")
         return self:ClilckFlag(list[1])
     end
@@ -359,7 +378,12 @@ function MapManager:MakeFlag()
         game.bag:CloseBag()
         return true
     end
-    self:searchAndClickText("00d011-101010", "新增路标")
+    local obj = self:RepeateSearchWords(10,"ST_11","新增路标",96, 127, 587+96, 362+127,"00d011-101010",1)
+    if not obj then
+        game.log.error("没有找到 新增路标")
+    end
+    HardWareUtil:MoveAndClick(obj)
+    skynet.sleep(50)
     game.log.info("插旗完成")
     game.bag:CloseBag()
     return true
@@ -445,6 +469,44 @@ function MapManager:ChatPos(coordPos,type)
     HardWareUtil:MoveAndClick(targetCPos)
     skynet.sleep(50)
 	return true
+end
+
+function MapManager:FlyDown()
+	if self:GetCurFlyState() then
+		HardWareUtil:KeyPad("alt+c")
+		skynet.sleep(50)
+	end
+end
+
+function MapManager:FlyUp()
+	if not self:GetCurFlyState() then
+		HardWareUtil:KeyPad("alt+c")
+		skynet.sleep(50)
+	end
+end
+
+function MapManager:GetCurFlyState()
+	--打开飞行御器 界面
+ 	HardWareUtil:KeyPad("alt+u")
+ 	
+    local path = "13.bmp|14.bmp"
+    local array = self:RepeateFindEx(10,100,100,800,600, path, "020202", 1, 0)
+    if not array then
+        game.log.info("飞行状态查询失败")
+        return
+    end
+ 	local fly = false
+   	local index = array[1].index
+   	if index == 0 then
+   		fly = false
+   	elseif index == 1 then
+   		fly = true
+   	else
+   		game.log.error("FLY STATE ERROR res = ",res)
+   	end
+	HardWareUtil:KeyPad("alt+u")
+
+	return fly
 end
 
 return MapManager

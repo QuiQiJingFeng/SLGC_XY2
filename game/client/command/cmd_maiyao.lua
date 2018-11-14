@@ -12,7 +12,7 @@ function cmd:Execute(name,num)
         end
         local newname = game.dmcenter:UTF8ToGBK(name)
         local path = "items/"..newname..".bmp"
-        local pos = self:RepeatFind(10, 0, 0, 800, 600, path, "020202", 1, 0)
+        local pos = self:RepeateFind(10, 0, 0, 800, 600, path, "020202", 1, 0)
         if not pos then
             game.log.warningf("没有找到对应的药品[%s]",name)
             return
@@ -22,7 +22,7 @@ function cmd:Execute(name,num)
            skynet.sleep(math.ceil(1,5))
         end
         local path = "goumai.bmp"
-        local pos = self:RepeatFind(10, 0, 0, 800, 600, path, "020202", 1, 0)
+        local pos = self:RepeateFind(10, 0, 0, 800, 600, path, "020202", 1, 0)
         if not pos then
             game.log.warning("洛阳药店找不到购买按钮")
             return
@@ -56,7 +56,7 @@ function cmd:Execute(name,num)
     local newname = game.dmcenter:UTF8ToGBK(name)
 
     local path = "items/"..newname..".bmp"
-    local pos = self:RepeatFind(10, 0, 0, 800, 600, path, "020202", 1, 0)
+    local pos = self:RepeateFind(10, 0, 0, 800, 600, path, "020202", 1, 0)
     if not pos then
         game.log.warningf("没有找到对应的药品[%s]",name)
         return
@@ -66,7 +66,7 @@ function cmd:Execute(name,num)
        skynet.sleep(math.ceil(1,5))
     end
     local path = "goumai.bmp"
-    local pos = self:RepeatFind(10, 0, 0, 800, 600, path, "020202", 1, 0)
+    local pos = self:RepeateFind(10, 0, 0, 800, 600, path, "020202", 1, 0)
     if not pos then
         game.log.warning("洛阳药店找不到购买按钮")
         return

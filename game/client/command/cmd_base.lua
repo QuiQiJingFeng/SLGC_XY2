@@ -1,12 +1,13 @@
 local skynet = require "skynet"
+local HardWareUtil = require "HardWareUtil"
 local cmd_base = {}
 
 function cmd_base:LoopCall(num,ptime,func)
     num = num or 1
     ptime = ptime or 10
     for i=1,num do
-        local ret = func()
-        if ret then return ret end
+        local ret1,ret2 = func()
+        if ret1 then return ret1,ret2 end
         skynet.sleep(ptime)
     end
 end
@@ -14,7 +15,7 @@ end
 function cmd_base:RepeateFind(num, x1, y1, x2, y2, pic_name, delta_color, sim, dir,time)
     return self:LoopCall(num,time,function() 
         local pos = game.dmcenter:FindPic(x1, y1, x2, y2, pic_name, delta_color, sim, dir)
-        if pos.x ~= 0 or pos.y ~= 0 then return end
+        if pos.x == 0 or pos.y == 0 then return end
         return pos
     end)
 end
@@ -58,6 +59,7 @@ function cmd_base:RepeateSearchWords(num,font,text,x1, y1, x2, y2,corlor_format,
         if #list <= 0 then return end
         for _, obj in pairs(list) do
             if string.find(obj.word,text) then
+                skynet.error("obj.word = ",obj.word)
                 return obj,list
             end
         end
@@ -85,6 +87,7 @@ end
 function cmd_base:ParseTask(taskName,corlor_format)
     HardWareUtil:KeyPad("alt+q")
     skynet.sleep(50)
+    game.dict:ChangeDict("ST_11")
     local list
     local select = nil
     for i = 1, 5 do
@@ -122,11 +125,11 @@ function cmd_base:ParseTask(taskName,corlor_format)
     end
 
     if string.find(select.word, "☆") then
-        HardWareUtil:MoveAndClick(select.pos)
+        HardWareUtil:MoveAndClick(select)
         skynet.sleep(20)
     end
-    select.pos.y = select.pos.y + 20
-    HardWareUtil:MoveAndClick(select.pos)
+    select.y = select.y + 20
+    HardWareUtil:MoveAndClick(select)
     skynet.sleep(20)
     corlor_format = corlor_format or "00ff00-101010"
     local str = game.dmcenter:Ocr(371, 158, 275 + 371, 293 + 158, corlor_format, 1)
@@ -165,6 +168,24 @@ function cmd_base:WaitMoveEnd(battleType)
         prePos = pos
         skynet.sleep(100)
     end
+end
+
+function cmd_base:MetchResource(path,filter)
+    local cmd = "ls dm/res/"..path
+    local file = io.popen(cmd)
+    local content = file:read("*a")
+    file:close()
+    local list = string.split(content,"\n")
+    local array = {}
+    for k,v in ipairs(list) do
+        if string.find(v,filter) then
+            table.insert(array,v)
+        end
+    end
+    if #array <= 0 then
+        game.log.error("没有匹配的图片")
+    end
+    return table.concat(array,"|")
 end
 
 return cmd_base

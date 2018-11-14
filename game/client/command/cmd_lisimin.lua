@@ -4,42 +4,40 @@ local super = require "command.cmd_base"
 local cmd = class("cmd", super)
 
 function cmd:Execute()
-    --[[
+    game.map:GoRoomScene("金銮殿","李世民")
+    game.map:GoTo("斧头帮总部",_p(50, 50),true,true)
+    if self:process() then
         game.map:GoRoomScene("金銮殿","李世民")
-        game.map:GoTo("斧头帮",_p(50, 50),true,true)
-        if self:process() then
-            game.map:GoRoomScene("金銮殿","李世民")
-            return true
-        end
-        return
-    ]]
+        return true
+    end
+    return
 end
 
 function cmd:process()
-    -- local list = {
-    --      _p(30, 100),
-    --      _p(100, 30)
-    -- }
-    -- local index = 1
-    -- while true do
-    --     if index == 3 then
-    --         index = 1
-    --     end
-    --     local pos = list[index]
-    --     local x = pos.x + math.random(1,5)
-    --     local y = pos.y + math.random(1,5)
-    --     game.map:GoTo("斧头帮",_p(x,y),true)
-    --     local ret = self:WaitMoveEnd("FIGHT")
-    --     --检测是否移动停止,停止则返回
-    --     if ret == "FIGHT" then
-    --         local text = self:ParseTask("职业任务")
-    --         if string.find(text, "李世民") then
-    --             return true
-    --         end
-    --     else
-    --         index = index + 1
-    --     end
-    -- end
+    local list = {
+         _p(30, 100),
+         _p(100, 30)
+    }
+    local index = 1
+    while true do
+        if index == 3 then
+            index = 1
+        end
+        local pos = list[index]
+        local x = pos.x + math.random(1,5)
+        local y = pos.y + math.random(1,5)
+        game.map:OpenCurSmallAndClick(_p(x,y))
+        local ret = self:WaitMoveEnd("FIGHT")
+        --检测是否移动停止,停止则返回
+        if ret == "FIGHT" then
+            local text = self:ParseTask("职业任务")
+            if string.find(text, "李世民") then
+                return true
+            end
+        else
+            index = index + 1
+        end
+    end
 end
 --[[
 
@@ -49,11 +47,11 @@ function cmd:Execute()
     skynet.sleep(50)
 
     --打开斧头帮的小地图
-    game.cmdcenterExecute("0009","斧头帮",_p(50, 50),false)
+    game.cmdcenterExecute("0009","斧头帮总部",_p(50, 50),false)
     --1、检测飞行棋
-    if not self:CheckFlyFlag("斧头帮", _p(50, 50),"big") then
+    if not self:CheckFlyFlag("斧头帮总部", _p(50, 50),"big") then
         --寻路到斧头帮
-        game.cmdcenterExecute("0012","斧头帮",_p(156, 147), true)
+        game.cmdcenterExecute("0012","斧头帮总部",_p(156, 147), true)
     end
     --检测是否移动停止,停止则返回
     game.cmdcenterExecute("0001","FIGHT")
@@ -97,7 +95,7 @@ function cmd:process()
         local pos = list[index]
         local x = pos.x + math.random(1,5)
         local y = pos.y + math.random(1,5)
-        game.map:GoTo("斧头帮",_p(x,y),true)
+        game.map:GoTo("斧头帮总部",_p(x,y),true)
         local ret = self:WaitMoveEnd("FIGHT")
         --检测是否移动停止,停止则返回
         if ret == "FIGHT" then

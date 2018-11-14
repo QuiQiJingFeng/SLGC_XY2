@@ -1,6 +1,6 @@
 local HardWareUtil = require "HardWareUtil"
 local skynet = require "skynet"
-local super = require "commands.base"
+local super = require "command.cmd_base"
 local TipManager = class("TipManager", super)
 
 function TipManager:Check(num,filter)
@@ -37,7 +37,7 @@ function TipManager:CheckYellowArea()
             game.log.warning("没有在指定的区域,黄色提示无效")
             return
         end
-        local pos = list[1].pos
+        local pos = list[1]
         if pos.x < 100 or pos.x > 600 or pos.y < 100 or pos.y > 600 then
             table.remove(list,1)
         else
@@ -46,7 +46,7 @@ function TipManager:CheckYellowArea()
     end
 
 
-    local pos = list[1].pos
+    local pos = list[1]
     --TODO
     local rect = _rect(pos,50)
     --获取深色颜色块
@@ -60,9 +60,9 @@ function TipManager:CheckYellowArea()
     local obj = list[1]
     skynet.error("检测到黄色提示->",obj.word)
 
-    obj.pos.x = obj.pos.x + math.random(10,50)
-    obj.pos.y = obj.pos.y + math.random(3,8)
-    HardWareUtil:MoveAndClick(obj.pos)
+    obj.x = obj.x + math.random(10,50)
+    obj.y = obj.y + math.random(3,8)
+    HardWareUtil:MoveAndClick(obj)
     skynet.sleep(100)
 end
 

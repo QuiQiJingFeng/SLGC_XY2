@@ -40,7 +40,7 @@ cmd["FIGHT"] = function(self)
     HardWareUtil:KeyPad("f1")
     local pos = game.dmcenter:GetCursorPos()
     local rect = _rect(pos,30)
-    local path = self:metchResource("jinzhi",".bmp")
+    local path = self:MetchResource("jinzhi",".bmp")
     self:RepeateFindEx(10,rect[1],rect[2],rect[3],rect[4],path,"000000",1,0)
 
     --获取颜色块
@@ -56,7 +56,7 @@ cmd["FIGHT"] = function(self)
     local screenData = game.dmcenter:GetScreenData(x1,y1,x2,y2)
     local list = screenData.list
     --计算这个矩形范围内,颜色发生的点的坐标
-    for i=1,5 do
+    for i=1,3 do
         local tool = game.dmcenter:GetScreenData(x1,y1,x2,y2)
         local time1 = skynet.time()
         local total = 0
@@ -114,8 +114,8 @@ cmd["FIGHT"] = function(self)
         end
         local rect = _rect(pos,50)
         HardWareUtil:MoveAndClick(pos)
-        local path1 = self:metchResource("fashu",".bmp")
-        local path2 = self:metchResource("jinzhi",".bmp")
+        local path1 = self:MetchResource("fashu",".bmp")
+        local path2 = self:MetchResource("jinzhi",".bmp")
         local path = path1.."|"..path2
         local result = self:RepeateFindEx(10,rect[1],rect[2],rect[3],rect[4],path,"000000",1,0,1)
         if not result then
@@ -148,8 +148,8 @@ cmd["ESCAPE"] = function(self)
 end
 
 cmd["CATCH"] = function(self)
-    local path1 = self:metchResource("master/youling",".bmp")
-    local path2 = self:metchResource("master/yegui",".bmp")
+    local path1 = self:MetchResource("master/youling",".bmp")
+    local path2 = self:MetchResource("master/yegui",".bmp")
     local path = path1.."|"..path2
     local find = nil
     local list = self:RepeateFindEx(100, 0, 75, 339, 460, path,"020202",0.95,0,1)

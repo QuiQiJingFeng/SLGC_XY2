@@ -1,6 +1,6 @@
 local HardWareUtil = require "HardWareUtil"
 local skynet = require "skynet"
-local super = require "commands.base"
+local super = require "command.cmd_base"
 local ItemManager = class("ItemManager", super)
 
 local cache = {}
@@ -11,7 +11,7 @@ function ItemManager:Distinguish(key,CONTENT_RECT)
     end
     
     local path = "items/"..game.dmcenter:UTF8ToGBK(key)..".bmp"
-    local list = self:RepeatFindEx(10,CONTENT_RECT[1],CONTENT_RECT[2],CONTENT_RECT[3],CONTENT_RECT[4], path, "020202", 1.0, 0)
+    local list = self:RepeateFindEx(10,CONTENT_RECT[1],CONTENT_RECT[2],CONTENT_RECT[3],CONTENT_RECT[4], path, "020202", 1.0, 0)
     if #list <= 0 then
         game.log.error("item num <= 0")
     end

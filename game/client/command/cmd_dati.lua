@@ -2,8 +2,8 @@ local skynet = require "skynet"
 local HardWareUtil = require "HardWareUtil"
 local super = require "command.cmd_base"
 local cmd = class("cmd", super)
-
-function cmd:Execute()
+--https://www.cnblogs.com/getlove/p/6148831.html
+function cmd:Execute(text)
     HardWareUtil:KeyPad("alt+f")
     skynet.sleep(100)
     HardWareUtil:MoveAndClick(_p(700,135))
@@ -15,7 +15,7 @@ function cmd:Execute()
     HardWareUtil:KeyPad("alt+f")
     skynet.sleep(100)
     HardWareUtil:KeyPad("alt+f")
-    local obj,list = self:RepeateSearchWords(1,"ST_10",text,150,100,600,500,"ffffff-000000",1)
+    local obj,list = self:RepeateSearchWords(1,"ST_10",text,150,120,700,500,"ffffff-000000",1)
     skynet.sleep(100)
     HardWareUtil:MoveToRightClick(_p(520,130))
     for idx,value in ipairs(list) do
