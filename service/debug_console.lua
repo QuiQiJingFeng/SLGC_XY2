@@ -93,22 +93,96 @@ local function console_main_loop(stdin, print)
 	socket.unlock(stdin)
 end
 
+-- skynet.start(function()
+-- 	local listen_socket = socket.listen ("127.0.0.1", port)
+-- 	skynet.error("Start debug console at 127.0.0.1 " .. port)
+-- 	socket.start(listen_socket , function(id, addr)
+-- 		local function print(...)
+-- 			local t = { ... }
+-- 			for k,v in ipairs(t) do
+-- 				t[k] = tostring(v)
+-- 			end
+-- 			socket.write(id, table.concat(t,"\t"))
+-- 			socket.write(id, "\n")
+-- 		end
+-- 		socket.start(id)
+-- 		skynet.fork(console_main_loop, id , print)
+-- 	end)
+-- end)
+
+local function response(id, ...)
+	local ok, err = httpd.write_response(sockethelper.writefunc(id), ...)
+	if not ok then
+		-- if err == sockethelper.socket_error , that means socket closed.
+		skynet.error(string.format("fd = %d, %s", id, err))
+	end
+end
+
 skynet.start(function()
-	local listen_socket = socket.listen ("127.0.0.1", port)
-	skynet.error("Start debug console at 127.0.0.1 " .. port)
-	socket.start(listen_socket , function(id, addr)
-		local function print(...)
-			local t = { ... }
-			for k,v in ipairs(t) do
-				t[k] = tostring(v)
-			end
-			socket.write(id, table.concat(t,"\t"))
-			socket.write(id, "\n")
-		end
+	local id = socket.listen("0.0.0.0", port)
+	skynet.error("Listen web port "..port)
+	socket.start(id , function(id, addr)
+		skynet.error("id start ",id)
 		socket.start(id)
-		skynet.fork(console_main_loop, id , print)
+		-- limit request body size to 8192 (you can pass nil to unlimit)
+		local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(id), 8192)
+		if code then
+			if code ~= 200 then
+				response(id, code)
+			else
+				local paramaters = {}
+				local path, query = urllib.parse(url)
+				if query then
+					local q = urllib.parse_query(query)
+					for k, v in pairs(q) do
+						paramaters[k] = v
+					end
+				end
+				for k,v in string.gmatch(body,"(%w+)=(%w+)") do
+					paramaters[k] = v
+				end
+				
+				local ret = COMMAND.execute(paramaters)
+				response(id, code,ret.."\n")
+			end
+		else
+			if url == sockethelper.socket_error then
+				skynet.error("socket closed")
+			else
+				skynet.error(url)
+			end
+		end
+		skynet.error("id close ",id)
+		socket.close(id)
 	end)
 end)
+local json = require("json")
+function COMMAND.execute(data)
+	local response = {code = 0,message = nil}
+	if not data.cmd or not COMMAND[data.cmd] then
+		response.code = -1
+		response.message = "unsupport command"
+	else
+		local cmd = COMMAND[data.cmd]
+		local args = {}
+		for i=1,20 do
+			local value = data[tostring(i)]
+			if value then
+				table.insert(args,data[tostring(i)])
+			end
+		end
+
+		local ok, message = pcall(cmd,table.unpack(args))
+		if ok then
+			response.code = 0
+			response.message = message
+		else
+			response.code = -1
+		end
+	end
+	
+	return json.encode(response)
+end
 
 function COMMAND.help()
 	return {
